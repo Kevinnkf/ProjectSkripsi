@@ -1,16 +1,5 @@
 const pool = require('./config'); // Import the pool
 
-// Example query
-pool.query('SELECT * FROM users', (err, res) => {
-  if (err) {
-    console.error(err);
-    // Handle error
-  } else {
-    console.log(res.rows);
-    // Process results
-  }
-});
-
 // Or using async/await:
 const getUsers = async (req, res) => {
     try {

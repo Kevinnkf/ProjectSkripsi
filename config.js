@@ -1,11 +1,22 @@
-const { Pool } = require('pg'); // Use Pool for connection pooling
+require('dotenv').config(); 
+
+const { Pool } = require('pg'); // Use CommonJS destructuring
 
 const pool = new Pool({
-  user: 'postgres', // Your PostgreSQL username
-  host: 'localhost', // Your PostgreSQL host
-  database: 'postgres', // Your PostgreSQL database name
-  password: 'donadoni', // Your PostgreSQL password
-  port: 5432, // Default PostgreSQL port (important!)
+  user: process.env.DB_USER,
+  host: process.env.DB_HOST,
+  database: process.env.DB_NAME,
+  password: process.env.DB_PASSWORD,
+  port: process.env.DB_PORT || 5432,
 });
 
-module.exports = pool; // Export the pool, not a single connection
+pool.connect()
+  .then(() => {
+    console.log('Successfully connected to PostgreSQL');
+  })
+  .catch(err => {
+    console.error('Error connecting to PostgreSQL:', err);
+    process.exit(1);
+  });
+
+export default pool; // Use module.exports
