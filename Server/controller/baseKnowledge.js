@@ -27,9 +27,9 @@ const postBaseKnowledge = async (req, res)=>{
 
     // Insert into database
     const result = await pool.query(
-      `INSERT INTO baseknowledge ("content", "notes", "created_by", "updated_by", "created_at", "updated_at") 
-       VALUES ($1, $2, $3, $4, NOW(), NOW()) RETURNING *`,
-      [file.buffer, notes, created_by, updated_by]
+      `INSERT INTO baseknowledge ("content", "notes", "created_by", "created_at") 
+       VALUES ($1, $2, $3, NOW()) RETURNING *`,
+      [file.buffer, notes, created_by]
     );
 
     res.status(201).json({
