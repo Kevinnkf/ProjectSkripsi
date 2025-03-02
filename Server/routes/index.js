@@ -1,23 +1,15 @@
 const express = require('express');
-const cors = require('cors');
-const bodyParser = require('body-parser');
 
-const adminsRoutes = require('./admins'); 
-const knowledgeRoutes = require ('./baseKnowledge')
-const authRoutes = require('./auth'); 
-const chatRoutes = require('./chats')
+const adminsRoutes = require('./admins');
+const knowledgeRoutes = require('./baseKnowledge');
+const authRoutes = require('./auth');
+const chatRoutes = require('./chats');
 
-const app = express();
-const port = 5000;
+const router = express.Router();
 
-app.use(cors());
-app.use(bodyParser.json());
+router.use('/api/chats', chatRoutes);
+router.use('/api/knowledge', knowledgeRoutes);
+router.use('/api/admins', adminsRoutes);
+router.use('/api/auth', authRoutes);
 
-app.use('/api/chats', chatRoutes)
-app.use('/api/knowledge', knowledgeRoutes)
-app.use('/api/admins', adminsRoutes);
-app.use('/api/auth', authRoutes);
-
-app.listen(port, () => {
-  console.log(`Server listening on port ${port}`);
-});
+module.exports = router;
