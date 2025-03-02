@@ -31,6 +31,7 @@ const registerAdmins = async (req, res)=>{
     })
   } catch (error) {
     console.error("Error registering admin", error)
+    console.log("Request Body: ", req.body)
     res.status(500).json({
       error: "Failed to register"
     })

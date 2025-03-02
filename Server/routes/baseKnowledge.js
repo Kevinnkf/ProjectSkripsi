@@ -1,8 +1,9 @@
 const express = require('express');
-const { getKnowledge } = require('../controller/baseKnowledge'); 
+const { getBaseKnowledge, postBaseKnowledge, upload } = require('../controller/baseKnowledge'); 
 
 const router = express.Router();
 
-router.get('/', getAdmins);
+router.get('/', getBaseKnowledge);
+router.post("/post", upload.single("content"), postBaseKnowledge);
 
 module.exports = router;
