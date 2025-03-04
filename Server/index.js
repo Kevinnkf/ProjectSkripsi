@@ -3,6 +3,8 @@ const cors = require('cors');
 const bodyParser = require('body-parser');
 const router = require('./routes'); // Import the centralized router
 
+require('dotenv').config();
+
 const app = express();
 const port = 5000;
 

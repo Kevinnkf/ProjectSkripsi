@@ -17,12 +17,12 @@ const registerAdmins = async (req, res)=>{
   try {
     
     // define request body
-    const {NIPPM, Password, Role, Created_at} = req.body
+    const {nippm, password, role, Created_at} = req.body
     
     // insert db nquery here
     const result = await pool.query(
-      'INSERT INTO admins ("NIPPM", "Password", "Role", "Created_at") VALUES ($1, $2, $3, $4) RETURNING *'
-      [NIPPM, Password, Role, Created_at]
+      'INSERT INTO admins ("nippm", "password", "role", "created_at") VALUES ($1, $2, $3, NOW()) RETURNING *'
+      [nippm, password, role]
     );
     
     res.status(201).json({

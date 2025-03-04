@@ -18,7 +18,7 @@ const getBaseKnowledge = async (req, res) => {
  
 const postBaseKnowledge = async (req, res)=>{
   try {
-    const {notes, created_by, updated_by} = req.body
+    const {notes, created_by} = req.body
     const file = req.file;
 
     if(!file){
