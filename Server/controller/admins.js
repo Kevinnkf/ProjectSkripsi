@@ -1,4 +1,4 @@
-const bycrypt = require('bcrypt')
+const bcrypt = require('bcrypt')
 const pool = require('../config/db'); // Use CommonJS require
 
 const getAdmins = async (req, res)=>{
@@ -17,12 +17,15 @@ const registerAdmins = async (req, res)=>{
   try {
     
     // define request body
-    const {nippm, password, role, Created_at} = req.body
+    const {nippm, password, role} = req.body
     
-    // insert db nquery here
+    // Hash the password before storing
+    const hashedPassword = await bcrypt.hash(password, 10); // 10 rounds of salting
+
+    // Insert to db
     const result = await pool.query(
-      'INSERT INTO admins ("nippm", "password", "role", "created_at") VALUES ($1, $2, $3, NOW()) RETURNING *'
-      [nippm, password, role]
+      'INSERT INTO admins ("nippm", "password", "role", "created_at") VALUES ($1, $2, $3, NOW()) RETURNING *',
+      [nippm, hashedPassword, role]
     );
     
     res.status(201).json({
