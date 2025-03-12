@@ -1,21 +1,30 @@
 <script setup>
-import HelloWorld from './components/HelloWorld.vue'
-import TheWelcome from './components/TheWelcome.vue'
-import WelcomeItem from './components/WelcomeItem.vue';
+import Chatbot from "./components/Chatbot.vue";
+import Dashboar from "./components/Dashboard.vue";
+import HelloWorld from "./components/HelloWorld.vue";
+import Navbar from "./components/Navbar.vue";
+import Sidebar from "./components/Sidebar.vue";
+import TheWelcome from "./components/TheWelcome.vue";
+import WelcomeItem from "./components/WelcomeItem.vue";
 </script>
 
 <template>
   <header>
-    <img alt="Vue logo" class="logo" src="./assets/logo.svg" width="125" height="125" />
+    <!-- <img alt="Vue logo" class="logo" src="./assets/logo.svg" width="125" height="125" />
 
     <div class="wrapper">
       <HelloWorld msg="You did it!" />
     </div>
+    <div class="wrapper">
+    <a href="http://localhost:5173/">Link to dashboard</a>
+    </div> -->
+    <Sidebar />
+    <!-- <Navbar/> -->
   </header>
 
   <main>
-    <TheWelcome />
-    <WelcomeItem/>
+    <Chatbot />
+    <Dashboar />
   </main>
 </template>
 
@@ -32,7 +41,7 @@ header {
 @media (min-width: 1024px) {
   header {
     display: flex;
-    place-items: center;
+    place-items: left;
     padding-right: calc(var(--section-gap) / 2);
   }
 
