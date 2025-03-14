@@ -81,7 +81,7 @@ onMounted(fetchChatHistory);
           </div>
         </div>
 
-        <!-- Input Section -->
+        <!-- Input Section -->index
         <div class="input-group mt-3">
           <input
             v-model="message"
@@ -97,6 +97,7 @@ onMounted(fetchChatHistory);
 </template>
 
 <style scoped>
+
 /* Chat container */
 .chat-container {
   max-width: 1540px;

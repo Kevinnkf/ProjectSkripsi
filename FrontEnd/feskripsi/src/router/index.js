@@ -1,13 +1,18 @@
 import { createRouter, createWebHistory } from 'vue-router';
-import Chatbot from '../components/Chatbot.vue';
+import Index from '@/components/BaseKnowledge/Index.vue';
+import Dashboard from '@/components/Dashboard.vue';
+
 
 const routes = [
-  { path: '/', component: Chatbot }
+  { path: '/', redirect: "/dashboard"},
+  { path: '/base-knowledge', component: Index},
+  { path: '/dashboard', component: Dashboard },
+  { path: '/:pathMatch(.*)*', component: Dashboard }, // Catch-all (optional)
 ];
 
 const router = createRouter({
   history: createWebHistory(),
-  routes
+  routes,
 });
 
 export default router;
