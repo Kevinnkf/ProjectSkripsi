@@ -9,11 +9,10 @@ import Sidebar from "./components/Sidebar.vue";
     
   </header>
 
-  <main>
-    
-    <div class="min-h-screen grid grid-cols-12 lg:grid grid-rows-1  ">
+  <main>      
+    <div class="min-h-screen grid grid-cols-12 lg:grid grid-rows-1">
         <!-- Sidebar (1st Column) -->
-        <aside class="col-span-2 text-white h-screen sticky top-0 overflow-auto z-50">
+        <aside v-if="$route.path !== '/login'" class="col-span-2 text-white h-screen sticky top-0 overflow-auto z-50">
             <Sidebar/>
         </aside>
     

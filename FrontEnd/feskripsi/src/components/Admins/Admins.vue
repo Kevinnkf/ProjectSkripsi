@@ -1,32 +1,7 @@
-<script>
-export default {
-  data() {
-    return {
-      chatData: [], // Initialize an empty array to store the API data
-    }
-  },
-  mounted() {
-    this.fetchKnowledgeData()
-  },
-  methods: {
-    async fetchKnowledgeData() {
-      try {
-        const response = await fetch('http://localhost:5000/api/knowledge')
-        const data = await response.json()
-        this.tableData = data
-        console.log(this.tableData)
-      } catch (error) {
-        console.error('Error fetching data:', error)
-      }
-    },
-  },
-}
-</script>
-
 <template>
   <div class="p-6">
-    <h1 class="text-2xl font-bold">Base Knowledge Page</h1>
-    <p>Welcome to the Base Knowledge section!</p>
+    <h1 class="text-2xl font-bold">Admins Page</h1>
+    <p>Welcome to the Admins section!</p>
   </div>
 
   <div
@@ -49,8 +24,8 @@ export default {
             </form> -->
 
         <div class="p-6">
-          <h1 class="text-2xl font-bold">List of SOP</h1>
-          <p>See the chatbot knowlege about Standard Operational Procedure</p>
+          <h1 class="text-2xl font-bold">List of active Admins</h1>
+          <p>See the active admins</p>
         </div>
 
         <!-- Data Table -->
@@ -62,7 +37,7 @@ export default {
             <tr>
               <th class="px-4 py-2 text-left font-bold uppercase border border-gray-200">ID</th>
               <th class="px-4 py-2 text-left font-bold uppercase border border-gray-200">
-                Filename
+                Role
               </th>
               <th class="px-4 py-2 text-center font-bold uppercase border border-gray-200">Time</th>
             </tr>
@@ -74,10 +49,11 @@ export default {
               class="border border-gray-200 hover:bg-gray-100"
             >
               <td class="px-4 py-2 border border-gray-200 text-gray-600">
-                {{ item.bk_id }}
+                {{ item.nippm }}
+                <!-- Fixed this line -->
               </td>
               <td class="px-4 py-2 border border-gray-200 text-gray-600">
-                {{ item.notes }}
+                {{ item.role }}
               </td>
               <td class="px-4 py-2 border border-gray-200 text-gray-600">
                 {{ item.created_at }}
@@ -90,3 +66,66 @@ export default {
     </div>
   </div>
 </template>
+
+<script>
+export default {
+  data() {
+    return {
+      tableData: [], // Initialize an empty array to store the API data
+    }
+  },
+  mounted() {
+    this.fetchData()
+  },
+  methods: {
+    async fetchData() {
+      try {
+        const response = await fetch('http://localhost:5000/api/admins') // Replace with your API URL
+        const data = await response.json()
+        this.tableData = data
+        console.log(this.tableData)
+      } catch (error) {
+        console.error('Error fetching data:', error)
+      }
+    },
+  },
+}
+</script>
+
+<style scoped>
+/* .data-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+  font-family: sans-serif;
+  max-width: 1540px;
+  margin-left: 13rem;
+  width: 100%;
+  height: 85vh;
+  display: flex;
+  flex-direction: column;
+} */
+
+/* .data-table th,
+.data-table td {
+  border: 1px solid #ddd;
+  padding: 8px;
+  text-align: left;
+} */
+
+/* .data-table th {
+  background-color: #f2f2f2;
+  font-weight: bold;
+  flex-grow: 1;
+  overflow-y: auto;
+  max-height: 70vh;
+} */
+
+/* .data-table tbody tr:nth-child(even) {
+  background-color: #f9f9f9;
+} */
+
+/* .data-table tbody tr:hover {
+  background-color: #e0e0e0;
+} */
+</style>
