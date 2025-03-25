@@ -71,7 +71,7 @@ export default {
             </form> -->
 
         <div class="p-6">
-          <h1 class="text-2xl font-bold">Latest Chat</h1>
+          <h1 class="text-2xl font-bold">Frequently Asked Questions</h1>
           <p>See what's user has been up to here</p>
         </div>
 

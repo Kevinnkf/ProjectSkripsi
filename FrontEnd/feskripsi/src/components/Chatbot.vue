@@ -2,6 +2,8 @@
 import { ref, onMounted } from "vue";
 import axios from "axios";
 
+
+
 const message = ref("");
 const chatHistory = ref([]);
 
@@ -18,7 +20,7 @@ const sendMessage = async () => {
     chatHistory.value.push({ role: "user", content: message.value });
     chatHistory.value.push({ role: "bot", content: response.data.botReply });
 
-    message.value = ""; // Clear input after sending
+    message.value = ""; // Clear input after
   } catch (error) {
     console.error("Error sending message:", error);
   }
@@ -44,81 +46,52 @@ onMounted(fetchChatHistory);
 </script>
 
 <template>
-  <div class="d-flex flex-column vh-100">
-    <!-- Header -->
-    <div
-      :style="{ backgroundColor: 'hsla(160, 100%, 37%, 1)', color: 'white' }"
-      class="text-center py-3 shadow"
-    >
-      <h3>Chatbot</h3>
-    </div>
-
+  <div class="d-flex flex-column vh-200">
     <!-- Chat Section -->
-    <div
-      class="flex-grow-1 d-flex flex-column align-items-center justify-content-center p-3"
-    >
-      <div class="chat-container w-100 h-100 p-3 rounded shadow-lg bg-white">
-        <!-- Chat History -->
-        <div class="chat-box p-3 border rounded bg-light" ref="chatBox">
-          <div
-            v-for="(chat, index) in chatHistory"
-            :key="index"
-            class="mb-3 d-flex"
-            :class="
-              chat.role === 'user' ? 'justify-content-end' : 'justify-content-start'
-            "
-          >
-            <!-- Message Bubble -->
-            <div
-              class="message p-2 rounded"
-              :class="
-                chat.role === 'user' ? 'bg-primary text-white' : 'bg-primary text-white'
-              "
-            >
-              <p class="fw-bold mb-1">{{ chat.role === "user" ? "You" : "Bot" }}:</p>
-              <p class="mb-0">{{ chat.content }}</p>
-            </div>
-          </div>
-        </div>
+    <div class="flex flex-col w-full max-w-screen-2xl mx-auto h-[700px] p-4 bg-gray-100 rounded-lg shadow-lg">
 
-        <!-- Input Section -->index
-        <div class="input-group mt-3">
-          <input
-            v-model="message"
-            @keyup.enter="sendMessage"
-            class="form-control"
-            placeholder="Type a message..."
-          />
-          <button @click="sendMessage" class="btn btn-primary">Send</button>
+    <!-- Chat History -->
+    <div class="flex-1 overflow-y-auto p-3 border rounded bg-white space-y-3" ref="chatBox">
+    <div v-for="(chat, index) in chatHistory" :key="index">
+
+      <!-- User Message (Right Side) -->
+      <div class="flex justify-end mb-2" v-if="chat.user_message">
+        <div class="p-3 max-w-xs bg-blue-500 text-white rounded-lg">
+          <p class="font-bold">You</p>
+          <p>{{ chat.user_message }}</p>
+        </div>
+      </div>
+
+      <!-- Bot Response (Left Side) -->
+      <div class="flex justify-start mb-2" v-if="chat.bot_response">
+        <div class="p-3 max-w-screen-md bg-gray-300 text-black rounded-lg">
+          <p class="font-bold">Bot</p>
+          <p>{{ chat.bot_response }}</p>
         </div>
       </div>
     </div>
+  </div>
+
+
+    <!-- Input Section -->
+    <div class="flex items-center gap-2 mt-3">
+      <input
+        v-model="message"
+        @keyup.enter="sendMessage"
+        class="flex-1 p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+        placeholder="Type a message..."
+      />
+      <button
+        @click="sendMessage"
+        class="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg transition"
+      >
+        Send
+      </button>
+    </div>
+  </div>
   </div>
 </template>
 
 <style scoped>
 
-/* Chat container */
-.chat-container {
-  max-width: 1540px;
-  margin-left: 13rem;
-  width: 100%;
-  height: 85vh;
-  display: flex;
-  flex-direction: column;
-}
-
-/* Chatbox styles */
-.chat-box {
-  flex-grow: 1;
-  overflow-y: auto;
-  max-height: 70vh;
-}
-
-/* Message bubble */
-.message {
-  max-width: 60%;
-  padding: 10px;
-  border-radius: 10px;
-}
 </style>

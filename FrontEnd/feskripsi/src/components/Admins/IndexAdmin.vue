@@ -1,84 +1,8 @@
-<script>
-import axios from 'axios';
-
-export default {
-  data() {
-    return {
-      chatData: [], // Initialize an empty array to store the API data
-      isModalOpen: false,
-      newKnowledge: {
-        bk_id: "",
-        content: "",
-        notes: "",
-        created_at: new Date().toISOString(),
-        created_by: "Kevin", // Will change this to current user logged on later on
-      },
-    };
-  },
-  mounted() {
-    this.fetchKnowledgeData();
-  },
-  methods: {
-    openModal() {
-      this.isModalOpen = true;
-    },
-
-    closeModal() {
-      this.isModalOpen = false;
-    },
-
-    async onChangeFileUpload(event){
-      this.newKnowledge.content = event.target.files[0];
-      console.log("Selected file:", this.newKnowledge);
-    },
-
-    async addKnowledge() {
-      if (!this.newKnowledge) {
-        alert("Please select a file first.");
-        return;
-      }
-
-      let formData = new FormData();
-      formData.append("content", this.newKnowledge.content); // File
-      formData.append("notes", this.newKnowledge.notes || ""); // Notes (optional)
-      formData.append("created_by", this.newKnowledge.created_by || "Unknown"); // Example additional fields
-
-      console.log(formData)
-
-      try {
-        const response = await axios.post("http://localhost:5000/api/knowledge/post", formData, {
-          headers: {
-            "Content-Type": "multipart/form-data", // Important for file uploads!
-          },
-        });
-
-        console.log("Upload success:", response);
-      } catch (error) {
-        console.error("Error: ", error);
-      }
-    },
-
-
-    async fetchKnowledgeData() {
-      try {
-        const response = await fetch("http://localhost:5000/api/knowledge");
-        const data = await response.json();
-        this.tableData = data;
-        console.log(this.tableData);
-      } catch (error) {
-        console.error("Error fetching data:", error);
-      }
-    },
-  },
-};
-</script>
-
 <template>
   <div class="p-6">
-    <h1 class="text-2xl font-bold">Base Knowledge Page</h1>
-    <p>Welcome to the Base Knowledge section!</p>
+    <h1 class="text-2xl font-bold">Admins Page</h1>
+    <p>Welcome to the Admins section!</p>
   </div>
-
 
   <div
     class="relative flex flex-col w-full min-w-0 mb-0 break-words bg-white border-0 border-transparent border-solid shadow-soft-xl rounded-2xl bg-clip-border"
@@ -98,22 +22,20 @@ export default {
                     <button type="submit" class="ml-2 text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5">Search</button>
                 </div>
             </form> -->
-
         <div class="flex justify-between">
           <div class="p-6">
-            <h1 class="text-2xl font-bold">List of SOP</h1>
-            <p>See the chatbot knowlege about Standard Operational Procedure</p>
+            <h1 class="text-2xl font-bold">List of active Admins</h1>
+            <p>See the active admins</p>
           </div>
           <div class="p-6">
             <button
               @click="openModal"
               class="px-4 py-2 bg-green-800 hover:bg-green-600 text-white rounded-lg transition"
             >
-              Add knowledge
+              Register Admin
             </button>
           </div>
         </div>
-
 
         <!-- Data Table -->
         <table
@@ -122,16 +44,25 @@ export default {
         >
           <thead class="bg-gray-100">
             <tr>
-              <th class="px-4 py-2 text-left font-bold uppercase border border-gray-200">
+              <th
+                class="px-4 py-2 text-center font-bold uppercase border border-gray-200"
+              >
                 ID
               </th>
-              <th class="px-4 py-2 text-left font-bold uppercase border border-gray-200">
-                Filename
+              <th
+                class="px-4 py-2 text-center font-bold uppercase border border-gray-200"
+              >
+                Role
               </th>
               <th
                 class="px-4 py-2 text-center font-bold uppercase border border-gray-200"
               >
                 Time
+              </th>
+              <th
+                class="px-4 py-2 text-center font-bold uppercase border border-gray-200"
+              >
+                Action
               </th>
             </tr>
           </thead>
@@ -142,13 +73,30 @@ export default {
               class="border border-gray-200 hover:bg-gray-100"
             >
               <td class="px-4 py-2 border border-gray-200 text-gray-600">
-                {{ item.bk_id }}
+                {{ item.nippm }}
+                <!-- Fixed this line -->
               </td>
               <td class="px-4 py-2 border border-gray-200 text-gray-600">
-                {{ item.notes }}
+                {{ item.role }}
               </td>
               <td class="px-4 py-2 border border-gray-200 text-gray-600">
                 {{ item.created_at }}
+              </td>
+              <td
+                class="px-4 py-2 border border-gray-200 text-gray-600 flex justify-center items-center"
+              >
+                <button
+                  @click="open"
+                  class="mx-4 px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg transition"
+                >
+                  Edit
+                </button>
+                <button
+                  @click="open"
+                  class="px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded-lg transition"
+                >
+                  Delete
+                </button>
               </td>
             </tr>
           </tbody>
@@ -161,28 +109,49 @@ export default {
         class="fixed inset-0 bg-gray-600 bg-opacity-50 flex justify-center items-center"
       >
         <div class="bg-white p-6 rounded-md w-96 overflow-y-auto max-h-[90vh]">
-          <h2 class="text-xl font-bold mb-4">Add new knowledge</h2>
+          <h2 class="text-xl font-bold mb-4">Register new admin</h2>
 
-          <form @submit.prevent="addKnowledge">
+          <form @submit.prevent="registerAdmin">
             <!-- Input Fields -->
             <div class="mb-4">
-              <label for="files" class="block text-sm font-semibold">Files</label>
-              <input class="w-full p-2.5 border rounded" type="file" id="file" ref="file" v-on:change="onChangeFileUpload"/>
+              <label for="nippm" class="block text-sm font-semibold">nippm</label>
+              <input
+                class="w-full p-2.5 border rounded"
+                v-model="newAdmin.nippm"
+                placeholder="Example: 2107412040"
+              />
             </div>
 
             <div class="mb-4">
-              <label for="notes" class="block text-sm font-semibold">Notes</label>
-              <textarea class="w-full p-2.5 border rounded" v-model="newKnowledge.notes" rows="" cols="" placeholder="Add notes here..."></textarea>
+              <label for="password" class="block text-sm font-semibold">Password</label>
+              <input
+                type="password"
+                class="w-full p-2.5 border rounded"
+                v-model="newAdmin.password"
+                placeholder="*********"
+              />
+            </div>
+
+            <div class="mb-4">
+              <label for="role" class="block text-sm font-semibold">Role</label>
+              <select
+                v-model="newAdmin.role"
+                class="w-full p-2.5 border rounded bg-white"
+              >
+                <option disabled value="">Please Select one</option>
+                <option>Super Admin</option>
+                <option>Admin</option>
+              </select>
             </div>
 
             <!-- Created At -->
             <div class="mb-4 hidden">
               <label for="created_at" class="block text-sm font-semibold">Time</label>
-              <!-- CHANGED: v-model now binds to newKnowledge.created_at -->
+              <!-- CHANGED: v-model now binds to newAdmin.created_at -->
               <input
                 type="datetime-local"
                 id="created_at"
-                v-model="newKnowledge.created_at"
+                v-model="newAdmin.created_at"
                 class="w-full p-2.5 border rounded"
               />
             </div>
@@ -206,3 +175,60 @@ export default {
     </div>
   </div>
 </template>
+
+<script>
+import axios from "axios";
+
+export default {
+  data() {
+    return {
+      tableData: [], // Stores API data
+      isModalOpen: false, // Controls modal visibility
+      newAdmin: {
+        nippm: "",
+        password: "",
+        role: "",
+        created_at: new Date().toISOString(), // Auto timestamp
+      },
+    };
+  },
+  methods: {
+    openModal() {
+      this.isModalOpen = true;
+    },
+    closeModal() {
+      this.isModalOpen = false;
+    },
+    async registerAdmin() {
+      try {
+        const response = await axios.post(
+          "http://localhost:5000/api/admins/register",
+          this.newAdmin
+        );
+        console.log("Success:", response.data);
+
+        // Refresh the table data
+        await this.fetchData();
+        this.closeModal();
+
+        // Reset form
+        this.newAdmin = { nippm: "", password: "", role: "", created_at: "" };
+      } catch (error) {
+        console.error("Error posting admin:", error);
+      }
+    },
+    async fetchData() {
+      try {
+        const response = await axios.get("http://localhost:5000/api/admins");
+        this.tableData = response.data;
+        console.log("Fetched Data:", this.tableData);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    },
+  },
+  mounted() {
+    this.fetchData(); // Fetch data when component is mounted
+  },
+};
+</script>
