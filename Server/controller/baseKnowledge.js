@@ -1,8 +1,8 @@
-const pool = require('../config/db'); // Ensure this is the correct path to your DB config
-const multer = require ('multer');
+const pool = require('../config/db');
+const multer = require('multer');
 
 const storage = multer.memoryStorage();
-const upload = multer({storage: storage});
+const upload = multer({ storage: storage });
 
 // Controller function to fetch all knowledge
 const getBaseKnowledge = async (req, res) => {
@@ -15,13 +15,13 @@ const getBaseKnowledge = async (req, res) => {
     res.status(500).json({ error: 'Failed to fetch knowledge' });
   }
 };
- 
-const postBaseKnowledge = async (req, res)=>{
+
+const postBaseKnowledge = async (req, res) => {
   try {
-    const {notes, created_by} = req.body
+    const { notes, created_by } = req.body
     const file = req.file;
 
-    if(!file){
+    if (!file) {
       return res.status(400).json({ error: "File is required" });
     }
 
