@@ -27,6 +27,14 @@ const sendMessageToBot = async (req, res) => {
       [user_id, message, botResponse]
     );
 
+    for (let index = 0; index < array.length; index++) {
+      const feedback = await pool.query('INSERT INTO Feedback ("id_feedback", "chat_id", "rating" ) VALUES ($1, $2, $3) ', 
+        [id_feedback, chat_id, rating]
+      );
+      const element = array[index];
+      
+    }
+
     res.json({
        botReply: botResponse
       });
