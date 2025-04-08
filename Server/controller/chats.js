@@ -4,7 +4,6 @@ require("dotenv").config();
 
 // example using OPENAI
 const openai = new OpenAI({
-  // apiKey: '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',
   apiKey: process.env.OPENAI_API_KEY,
 });
 
