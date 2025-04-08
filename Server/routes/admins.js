@@ -1,9 +1,11 @@
 const express = require('express');
-const { getAdmins, registerAdmins } = require('../controller/admins'); 
+const {registerAdmins, findAll } = require('../controller/admins'); 
 
 const router = express.Router();
 
-router.get('/', getAdmins);
+router.get('/', findAll);
 router.post('/register', registerAdmins);
 
 module.exports = router;
+
+// router.get('/', getAdmins);

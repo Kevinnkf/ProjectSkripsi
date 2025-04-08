@@ -4,6 +4,7 @@ require("dotenv").config();
 
 // example using OPENAI
 const openai = new OpenAI({
+  // apiKey: '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',
   apiKey: process.env.OPENAI_API_KEY,
 });
 
@@ -21,7 +22,7 @@ const sendMessageToBot = async (req, res) => {
     const botResponse = response.choices[0].message.content
     const user_id = 2107412040
 
-    // Correct SQL Query with proper placeholders
+    // Send query to pool
     const result = await pool.query(
       'INSERT INTO chats ("id_user", "user_message", "bot_response", "chat_time") VALUES ($1, $2, $3, NOW())',
       [user_id, message, botResponse]
