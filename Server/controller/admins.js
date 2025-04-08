@@ -1,45 +1,50 @@
 const bcrypt = require('bcrypt')
 const pool = require('../config/db'); // Use CommonJS require
+const db = require("../models");
+const Admin = db.admins;
 
-const getAdmins = async (req, res)=>{
+const findAll = async(req, res)=>{
   try {
-    const result = await pool.query('SELECT * FROM admins')
-    res.json(result.rows)
-  } catch (err) {
-    console.error("Error", err)
+    const result = await Admin.findAll();
+    res.json(result);
+    console.log(result);
+  } catch (error) {
+    console.error("Error", error);
     res.status(500).json({
-      err: 'Failed'
-    })
-  }
-}
+      err: 'Failed: ' + error.message
+    });
+  };
+};  
 
-const registerAdmins = async (req, res)=>{
+const registerAdmins = async (req, res) => {
   try {
-    
-    // define request body
-    const {nippm, password, role} = req.body
-    
-    // Hash the password before storing
-    const hashedPassword = await bcrypt.hash(password, 10); // 10 rounds of salting
+    const { id, nippm, password, role } = req.body;
 
-    // Insert to db
-    const result = await pool.query(
-      'INSERT INTO admins ("nippm", "password", "role", "created_at") VALUES ($1, $2, $3, NOW()) RETURNING *',
-      [nippm, hashedPassword, role]
-    );
-    
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    const newAdmin = await Admin.create({
+      id,
+      nippm,
+      password: hashedPassword,
+      role,
+    });
+
     res.status(201).json({
       message: "Registered successfully",
-      admin: result.rows[0]
-    })
+      admin: newAdmin,
+    });
   } catch (error) {
-    console.error("Error registering admin", error)
-    console.log("Request Body: ", req.body)
-    res.status(500).json({
-      error: "Failed to register"
-    })
-    
-  }
-}
+    console.error("Error registering admin", error);
+    console.log("Request Body: ", req.body);
 
-module.exports = { getAdmins, registerAdmins }; // Correct CommonJS export
+    if (!res.headersSent) {
+      res.status(500).json({
+        error: "Failed to register",
+        detail: error.message,
+      });
+    }
+  }
+};
+
+
+module.exports = {registerAdmins, findAll}; // Correct CommonJS export

@@ -20,7 +20,7 @@ const login = async (req, res) => {
 
     if (!isCorrect) {
       console.log("Error Logging in:", req.body);
-      console.log(user.password);
+      console.log(user.password); 
       console.log(password);
       return res.status(401).json({ error: "Invalid credentials" });
     }
