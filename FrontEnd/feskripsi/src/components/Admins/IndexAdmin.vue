@@ -163,6 +163,16 @@ export default {
     closeModal() {
       this.isModalOpen = false;
     },
+
+    async deleteAdmin() {
+      try {
+        const response = await axios.delete("http://localhost:5000/api/admins/deleteById")
+        console.log(response.data)
+      } catch (error) {
+        console.error(error)  
+      }
+    },
+
     async registerAdmin() {
       try {
         const response = await axios.post(

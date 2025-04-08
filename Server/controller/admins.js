@@ -3,6 +3,23 @@ const pool = require('../config/db'); // Use CommonJS require
 const db = require("../models");
 const Admin = db.admins;
 
+const deleteById = async(req, res)=>{
+  try {
+    const findById = await Admin.findByPk(req.params.id);
+
+    const result = await findById.destroy()
+
+    res.json(result);
+    console.log(result);
+    
+    
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Error deleting user" });
+    
+  }
+}
+
 const findAll = async(req, res)=>{
   try {
     const result = await Admin.findAll();
@@ -47,4 +64,4 @@ const registerAdmins = async (req, res) => {
 };
 
 
-module.exports = {registerAdmins, findAll}; // Correct CommonJS export
+module.exports = {registerAdmins, findAll, deleteById}; // Correct CommonJS export
