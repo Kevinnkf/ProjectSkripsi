@@ -1,6 +1,9 @@
 const pool = require('../config/db'); // Ensure this is the correct path to your DB config
 const { OpenAI } = require("openai");
 require("dotenv").config();
+const db = require('../models');
+const Chat = db.chats
+
 
 // example using OPENAI
 const openai = new OpenAI({
@@ -21,25 +24,21 @@ const sendMessageToBot = async (req, res) => {
     const botResponse = response.choices[0].message.content
     const user_id = 2107412040
 
-    // Send query to pool
-    const result = await pool.query(
-      'INSERT INTO chats ("id_user", "user_message", "bot_response", "chat_time") VALUES ($1, $2, $3, NOW())',
-      [user_id, message, botResponse]
-    );
-
-    for (let index = 0; index < array.length; index++) {
-      const feedback = await pool.query('INSERT INTO Feedback ("id_feedback", "chat_id", "rating" ) VALUES ($1, $2, $3) ', 
-        [id_feedback, chat_id, rating]
-      );
-      const element = array[index];
-      
-    }
+    const result = await Chat.create({
+      user_id: user_id,
+      user_message: message,
+      bot_response: botResponse,
+      chat_time: new Date(),
+      created_at: new Date(),
+    });
 
     res.json({
-       botReply: botResponse
-      });
+      botReply: botResponse,
+      message: result
+    });
   } catch (error) {
     console.error("Error getting bot response:", error);
+    console.log(process.env.OPENAI_API_KEY);
     res.status(500).json({ error: "Failed to get bot response" });
   }
 };

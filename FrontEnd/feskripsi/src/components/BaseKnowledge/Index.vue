@@ -115,6 +115,9 @@ export default {
                 <th class="px-4 py-2 text-left font-bold uppercase border border-gray-200">
                   Filename
                 </th>
+                <th class="px-4 py-2 text-left font-bold uppercase border border-gray-200">
+                  Notes
+                </th>
                 <th class="px-4 py-2 text-center font-bold uppercase border border-gray-200">
                   Time
                 </th>
@@ -128,6 +131,9 @@ export default {
               >
                 <td class="px-4 py-2 border border-gray-200 text-gray-600">
                   {{ item.bk_id }}
+                </td>
+                <td class="px-4 py-2 border border-gray-200 text-gray-600">
+                  {{ item.filename }}
                 </td>
                 <td class="px-4 py-2 border border-gray-200 text-gray-600">
                   {{ item.notes }}
