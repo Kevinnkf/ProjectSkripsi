@@ -94,7 +94,7 @@
 
           <li>
             <button
-              @click="goToAdmins"
+              @click="goToChatbot"
               class="group relative flex items-center w-full p-3 font-medium text-left rounded-lg transition-all duration-200 text-gray-300 hover:bg-gray-800 hover:text-white"
             >
               <div class="absolute left-0 w-1 h-6 bg-cyan-500 rounded-r-lg opacity-0 group-hover:opacity-100 transition-all duration-300"></div>
@@ -204,6 +204,9 @@ export default {
     },
     goToAdmins() {
       this.$router.push('/admins')
+    },
+    goToChatbot() {
+      this.$router.push('/chatbot')
     },
   },
 }
