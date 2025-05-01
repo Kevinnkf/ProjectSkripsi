@@ -1,14 +1,8 @@
 <template>
+<div>
   <div class="p-6">
     <h1 class="text-2xl font-bold">Dashboard Page</h1>
     <p>Welcome to the Dashboard section!</p>
-    
-    <!-- Logout Button -->
-    <button 
-      @click="logout" 
-      class="mt-4 text-white bg-red-500 hover:bg-red-700 focus:ring-4 focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5">
-      Logout
-    </button>
   </div>
 
   <div
@@ -88,6 +82,7 @@
       </div>
     </div>
   </div>
+</div>
 </template>
 
 <script>
@@ -111,10 +106,6 @@ export default {
         console.error('Error fetching data:', error)
       }
     },
-    logout() {
-      localStorage.removeItem('token');  // Remove the token from localStorage
-      this.$router.push('/login');  // Redirect to the login page
-    }
   },
 }
 </script>

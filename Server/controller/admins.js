@@ -2,6 +2,7 @@ const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 const pool = require('../config/db'); // Use CommonJS require
 const db = require("../models");
+const { Op } = require('sequelize');
 const Admin = db.admins;
 
 async function login(req, res) {
@@ -111,5 +112,23 @@ const registerAdmins = async (req, res) => {
   }
 };
 
+const searchAdmins = async (req, res ) => {
+  try {
+    const admin = await Admin.findOne({
+      where: {
+        nippm: {
+          [Op.iLike]: `%${req.params.nippm}%` // Case-insensitive match
+        }
+      }
+    });
+    res.json(admin);
+  } catch (error) {
+    console.error("Erorr searching admin", error)
+    res.status(500).json({
+      error: "failed" + error.message
+    })
+  }
+}
 
-module.exports = {registerAdmins, findAll, deleteById, login}; // Correct CommonJS export
+
+module.exports = {registerAdmins, findAll, deleteById, login, searchAdmins}; // Correct CommonJS export

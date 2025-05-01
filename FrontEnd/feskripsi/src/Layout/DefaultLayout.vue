@@ -1,36 +1,61 @@
 <script setup>
+import Navbar from "@/components/Navbar.vue";
 import Sidebar from "../components/Sidebar.vue";
+import { ref } from 'vue'
+
+const isSidebarOpen = ref(false)
+
+
 </script>
 
 <template>
-  <div>
-    <header>
-      <!-- <Sidebar /> -->
-    </header>
+  <div class="font-helvetica min-h-screen flex">
+    
+    <!-- Sidebar -->
+    <aside v-if="$route.path !== '/login'" 
+      :class="[
+        'h-screen w-64 bg-[#064E3B] text-white transition-transform duration-300 z-50 sticky top-0',
+        isSidebarOpen ? 'translate-x-0' : '-translate-x-full',
+        'lg:translate-x-0 lg:static lg:block'
+      ]"
+    >
+      <div @click="showMenu = !showMenu" class="lg:hidden"></div>
+      <Sidebar/>
+    </aside>
 
-    <main>
-      <div class="min-h-screen grid grid-cols-12 lg:grid grid-rows-1">
-        <!-- Sidebar (1st Column) -->
-        <aside v-if="$route.path !== '/login'" class="col-span-2 text-white h-screen sticky top-0 overflow-auto z-50">
-          <Sidebar/>
-        </aside>
+    <!-- Main Content -->
+    <main class="flex-1 flex flex-col">
+      <!-- Mobile menu button -->
+      <button 
+        @click="isSidebarOpen = !isSidebarOpen"
+        class="block lg:hidden fixed top-4 left-4 z-50 p-2 rounded-md bg-gray-800 text-white hover:bg-gray-700 transition"
+      > 
+        <svg class="h-6 w-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"/>
+        </svg>
+      </button>
 
-        <!-- Content and Footer (2nd Column) -->
-        <div class="col-span-10 flex flex-col">
-          <!-- Main Content -->
-          <div class="flex-grow p-6">
-            <!-- Breadcrumb -->
-            <nav class="flex px-5 py-3 mb-4 text-gray-700 rounded-lg bg-gray-50 dark:bg-white" aria-label="Breadcrumb">
-              <ol class="inline-flex items-center space-x-1 md:space-x-2 rtl:space-x-reverse">
-              </ol>
-            </nav>
-            <router-view></router-view>
-          </div>
-        </div>
+      <!-- Navbar -->
+      <header>
+        <Navbar />
+      </header>
+
+      <!-- Breadcrumb -->
+      <nav class="flex px-5 py-3 mb-4 text-gray-700 rounded-lg bg-gray-50 dark:bg-white" aria-label="Breadcrumb">
+        <ol class="inline-flex items-center space-x-1 md:space-x-2 rtl:space-x-reverse">
+          <!-- Breadcrumb items here -->
+        </ol>
+      </nav>
+
+      <!-- Router View (Main page content) -->
+      <div class="flex-grow">
+        <router-view></router-view>
       </div>
     </main>
+
   </div>
 </template>
+
 
 
 <style scoped>

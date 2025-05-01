@@ -152,6 +152,13 @@
               <span class="text-sm font-medium">Settings</span>
             </button>
           </li>
+          <li>
+            <button 
+              @click="logout" 
+              class="mt-4 w-full text-white bg-red-500 hover:bg-red-700 focus:ring-4 focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5">
+              Logout
+            </button>
+          </li>
         </ul>
       </nav>
     </div>
@@ -168,8 +175,10 @@
           <span class="absolute bottom-0 right-0 w-3 h-3 bg-green-500 rounded-full border-2 border-gray-900"></span>
         </div>
         <div class="ml-3">
-          <p class="text-sm font-medium text-white">Admin User</p>
-          <p class="text-xs text-gray-400">admin@example.com</p>
+          <!-- <p class="text-sm font-medium text-white">{{ userStore.user?.name || 'Guest' }}Guest </p>
+          <p class="text-xs text-gray-400">{{ userStore.user?.email || 'Guest' }} Guest</p> -->
+          <p class="text-sm font-medium text-white"> {{userStore.user?.nippm || 'Could not fetch NIPPM'}} </p>
+          <p class="text-xs text-gray-400">{{ userStore.user?.role || 'Could not fetch role' }} </p>
         </div>
       </div>
     </div>
@@ -177,7 +186,17 @@
 </template>
 
 <script>
+import { useUserStore } from '@/stores/UserStores'
+
 export default {
+  setup() {
+    const userStore = useUserStore()
+
+    return{
+      userStore,
+    }
+
+  },
   data() {
     return {
       masterData: [{ description: 'Master 1', condition: 'FIELD', typegcm: 'Type A' }],
@@ -207,6 +226,10 @@ export default {
     },
     goToChatbot() {
       this.$router.push('/chatbot')
+    },
+    logout() {  
+      localStorage.removeItem('token');  // Remove the token from localStorage
+      this.$router.push('/login');  // Redirect to the login page
     },
   },
 }

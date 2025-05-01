@@ -2,12 +2,13 @@ const pool = require('../config/db');
 const multer = require('multer');
 const fs = require('fs');
 const path = require('path');
+const { Op } = require('sequelize');
+const client = require ('@qdrant/js-client-rest');
 
 const db = require('../models');
 const bk = db.baseknowledge;
 
 // Set destination folder
-// const uploadFolder = path.join(__dirname, '../uploads') || process.env.UPLOAD_DIR;
 const uploadFolder = path.join(__dirname, '../uploads');
 
 // Ensure upload folder exists
@@ -33,10 +34,18 @@ const getBaseKnowledge = async (req, res) => {
   try {
     const result = await bk.findAll();
     res.json(result);
+    // client = new QdrantClient(
+    //   url="https://48b49ac1-8387-42bb-b0d7-10587d2aa625.eu-west-1-0.aws.cloud.qdrant.io",
+    //   api_key="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhY2Nlc3MiOiJtIn0.1ugiYzO7TerHdVXROwWBNgIMkv3zMymBGeMrKXVvm68",
+    // )
+    // const hasil = await client.getCollections();
+    // console.log('test'); 
+    // console.log('List of collections:', hasil.collections);
+
   } catch (error) {
     console.error('Error fetching knowledge:', error);
     res.status(500).json({ error: 'Failed to fetch knowledge' });
-  }
+  } 
 };
 
 // Post new knowledge
@@ -56,6 +65,8 @@ const postBaseKnowledge = async (req, res) => {
       created_by,
       created_at: new Date()
     });
+    
+  
 
     res.status(201).json({
       message: "Base knowledge added successfully",
@@ -67,4 +78,49 @@ const postBaseKnowledge = async (req, res) => {
   }
 };
 
-module.exports = { getBaseKnowledge, postBaseKnowledge, upload };
+const searchBaseKnowledge = async (req, res) => {
+  try {
+    const file = await bk.findOne({
+      where: {
+        filename: {
+          [Op.iLike]: `%${req.params.filename}%`
+        }
+      }
+    });
+
+    if(!file){
+      return "File does not exist, please check again"
+    }
+    
+    res.json(file);
+  } catch (error) {
+    console.error("Error searching files", error);
+    res.status(500).json({
+      error: "failed: " + error.message
+    });
+  }
+};
+
+const upsertKnowledge = async (req, res) => {
+  try {
+    const file = path.join(__dirname, '../uploads');
+    const content = fs.readFileSync(file, 'utf-8');
+
+    const data = {
+      id: filename,
+      payload: {
+        content: content,
+        filename: req.file.originalName
+      }
+    }
+
+    const response = await axios.post('https://48b49ac1-8387-42bb-b0d7-10587d2aa625.eu-west-1-0.aws.cloud.qdrant.io:6333/collections')
+
+
+  } catch (error) {
+    
+  }
+}
+
+
+module.exports = { getBaseKnowledge, postBaseKnowledge, upload , searchBaseKnowledge};

@@ -1,3 +1,5 @@
 <template>
-    <router-view />
+    <div class="font-helvetica">
+        <router-view />
+    </div>
 </template>

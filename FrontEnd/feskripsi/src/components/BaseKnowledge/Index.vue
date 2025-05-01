@@ -64,7 +64,6 @@ export default {
         const response = await fetch("http://localhost:5000/api/knowledge");
         const data = await response.json();
         this.tableData = data;
-        console.log(this.tableData);
       } catch (error) {
         console.error("Error fetching data:", error);
       }

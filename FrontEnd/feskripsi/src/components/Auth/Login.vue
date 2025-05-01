@@ -60,6 +60,7 @@
 
 <script>
 import axios from 'axios';
+import { useUserStore } from '../Stores/UserStore.vue';
 
 export default {
   data() {
@@ -70,7 +71,6 @@ export default {
   },
   methods: {
     async loginUser() {
-      console.log('NIPP:', this.nippm); // Check if nippm is not empty
       const nippmInt = parseInt(this.nippm, 10);  // Convert to an integer
       if (isNaN(nippmInt)) {
         alert('Please enter a valid NIPP');
@@ -87,15 +87,18 @@ export default {
             withCredentials: true // Allow cookies
           }
         );
+        const userData = {
+          nippm: response.data.nippm,
+          role: response.data.role
+          
+        }
+        const userStore = useUserStore()
+        userStore.setUser(userData);
 
         // Store token in localStorage (or use cookies if preferred)
         localStorage.setItem('token', response.data.token);
 
-        console.log(response.data.message);
         this.$router.push('/dashboard');  // Redirect to the dashboard
-
-        console.log(response.data.message); // “You have successfully logged in.”
-        this.$router.push('/dashboard'); // Redirect after successful login
 
       } catch (error) {
         console.error("Login failed:", error.response?.data?.message || error.message);

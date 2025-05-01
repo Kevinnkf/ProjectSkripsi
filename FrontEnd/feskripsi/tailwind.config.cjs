@@ -7,7 +7,14 @@ module.exports = {
     './src/**/*.{js,jsx,ts,tsx,vue}',
   ],
   theme: {
-    extend: {},
+    extend: {
+      fontFamily:{
+        poppins: ['Poppins', 'sans-serif'],
+        roboto: ['Roboto', 'serif'],
+        helvetica: ['Helvetica']
+
+      }
+    },
   },
   plugins: [],
 }
