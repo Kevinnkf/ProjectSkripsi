@@ -32,6 +32,9 @@
     </div>
     <div class="flex-col justify-between">
       <div class="p-6 pb-0 mb-2 bg-white rounded-t-2xl">
+        <h1 class="text-2xl font-bold"> Chatbot response in the last 7 days</h1>
+        <p>Chat fot </p>
+        <canvas id="myChart" width="400" height="100"></canvas>
       </div>
     </div>
     <div class="flex-auto px-0 pt-0 pb-2 space-x-5">
@@ -85,23 +88,103 @@
 </div>
 </template>
 
+
+
 <script>
+import Chart from 'chart.js/auto'
+
 export default {
   data() {
     return {
-      chatData: [], // Initialize an empty array to store the API data
+      chatData: [],
+      chart: null,
     }
   },
   mounted() {
+    this.renderChart()
     this.fetchChatData()
   },
   methods: {
+    getLast7DaysLabels() {
+      const days = []
+      const today = new Date()
+      const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
+
+      for (let i = 6; i >= 0; i--) {
+        const d = new Date(today)
+        d.setDate(d.getDate() - i)
+        const isoDate = d.toISOString().split('T')[0] // '2025-05-01'
+        days.push({
+          date: isoDate,
+          label: dayNames[d.getDay()],
+        })
+      }
+
+      return days
+    },
+
+    // countMessagesPerDay(data, days) {
+    //   return days.map(dayObj => {
+    //     const count = data.filter(chat =>
+    //       chat.createdAt.startsWith(dayObj.date)
+    //     ).length
+    //     return count
+    //   })
+    // },
+
+    countMessagesPerDay(data, days) {
+      return days.map(dayObj => {
+        const count = data.filter(chat => {
+          const createdAt = chat.createdAt || chat.created_at || '' // fallback
+          return typeof createdAt === 'string' && createdAt.startsWith(dayObj.date)
+        }).length
+        return count
+
+      })
+    },
+
+    renderChart() {
+      const ctx = document.getElementById('myChart').getContext('2d')
+      this.chart = new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: [],
+          datasets: [{
+            label: 'Chatbot Responses (Last 7 Days)',
+            data: [],
+            borderColor: '#60a5fa',
+            backgroundColor: '#60a5fa33',
+            tension: 0.4,
+            fill: true,
+          }],
+        },
+        options: {
+          responsive: true,
+          scales: {
+            y: {
+              beginAtZero: true,
+              ticks: {
+                precision: 0, // avoid decimal numbers
+              },
+            },
+          },
+        },
+      })
+    },
     async fetchChatData() {
       try {
         const response = await fetch('http://localhost:5000/api/chats')
         const data = await response.json()
-        this.tableData = data
-        console.log(this.tableData)
+        this.chatData = data
+        
+        const dayObjects = this.getLast7DaysLabels()
+        const labels = dayObjects.map(d => d.label)
+        const values = this.countMessagesPerDay(data, dayObjects)
+
+        this.chart.data.labels = labels
+        this.chart.data.datasets[0].data = values
+        this.chart.update()
+
       } catch (error) {
         console.error('Error fetching data:', error)
       }

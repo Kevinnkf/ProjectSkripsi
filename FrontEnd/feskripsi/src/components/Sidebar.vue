@@ -1,5 +1,5 @@
 <template>
-  <div class="w-64 fixed left-0 top-0 bottom-0 bg-[#064E3B] border-r border-gray-700 flex flex-col justify-between overflow-y-auto z-10 transition-all duration-300 hover:shadow-2xl hover:shadow-cyan-500/20">
+  <div class="w-64 sticky h-screen left-0 top-0 bottom-0 bg-[#064E3B] border-r border-gray-700 flex flex-col justify-between overflow-y-auto z-10 transition-all duration-300 hover:shadow-2xl hover:shadow-cyan-500/20">
     <!-- Main Content -->
     <div class="flex-1 flex flex-col">
       <!-- Logo Section -->
@@ -177,8 +177,9 @@
         <div class="ml-3">
           <!-- <p class="text-sm font-medium text-white">{{ userStore.user?.name || 'Guest' }}Guest </p>
           <p class="text-xs text-gray-400">{{ userStore.user?.email || 'Guest' }} Guest</p> -->
-          <p class="text-sm font-medium text-white"> {{userStore.user?.nippm || 'Could not fetch NIPPM'}} </p>
-          <p class="text-xs text-gray-400">{{ userStore.user?.role || 'Could not fetch role' }} </p>
+          <p class="text-sm font-medium text-white"> {{ userStore.nippm || 'Could not fetch NIPPM' }} </p>
+          <p class="text-xs text-gray-400">{{ userStore.role || 'Could not fetch role' }} </p>
+          {{ console.log (userStore) }}
         </div>
       </div>
     </div>
@@ -186,15 +187,13 @@
 </template>
 
 <script>
-import { useUserStore } from '@/stores/UserStores'
+import { useUserStore } from '@/components/Stores/UserStore.vue'
+import Swal from 'sweetalert2'
 
 export default {
   setup() {
     const userStore = useUserStore()
-
-    return{
-      userStore,
-    }
+    return { userStore }
 
   },
   data() {
@@ -228,8 +227,21 @@ export default {
       this.$router.push('/chatbot')
     },
     logout() {  
-      localStorage.removeItem('token');  // Remove the token from localStorage
-      this.$router.push('/login');  // Redirect to the login page
+      Swal.fire({
+        title: "Are you sure you want to log out?",
+        text: "You will have to re-login.",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#d33",
+        cancelButtonColor: "#064E3B",
+        confirmButtonText: "Yes, log out!",
+        cancelButtonText: "Cancel"
+      }).then((result) => {
+        if (result.isConfirmed) {
+          localStorage.removeItem('token');  // Remove the token from localStorage
+          this.$router.push('/login');       // Redirect to login page
+        }
+      });
     },
   },
 }

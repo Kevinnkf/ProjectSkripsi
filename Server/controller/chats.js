@@ -2,7 +2,7 @@ const pool = require('../config/db'); // Ensure this is the correct path to your
 const { OpenAI } = require("openai");
 require("dotenv").config();
 const db = require('../models');
-const Chat = db.chats
+const Chat = db.Chat
 
 
 // example using OPENAI

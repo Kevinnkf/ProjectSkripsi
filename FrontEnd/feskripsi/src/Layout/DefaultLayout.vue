@@ -1,59 +1,72 @@
 <script setup>
 import Navbar from "@/components/Navbar.vue";
 import Sidebar from "../components/Sidebar.vue";
-import { ref } from 'vue'
+import { onMounted, ref } from 'vue'
+import { useUserStore } from '@/components/Stores/UserStore.vue'
 
+const userStore = useUserStore()
 const isSidebarOpen = ref(false)
+
+onMounted(() => {
+  userStore.restoreUserFromToken()
+})
 
 
 </script>
 
 <template>
-  <div class="font-helvetica min-h-screen flex">
-    
-    <!-- Sidebar -->
-    <aside v-if="$route.path !== '/login'" 
-      :class="[
-        'h-screen w-64 bg-[#064E3B] text-white transition-transform duration-300 z-50 sticky top-0',
-        isSidebarOpen ? 'translate-x-0' : '-translate-x-full',
-        'lg:translate-x-0 lg:static lg:block'
-      ]"
-    >
-      <div @click="showMenu = !showMenu" class="lg:hidden"></div>
-      <Sidebar/>
-    </aside>
+  <div class="font-helvetica h-screen flex overflow-hidden">
+  
+  <!-- Desktop Sidebar -->
+  <aside v-if="$route.path !== '/login'" class="w-64 h-full bg-[#064E3B] text-white overflow-y-auto hidden lg:block">
+    <Sidebar />
+  </aside>
 
-    <!-- Main Content -->
-    <main class="flex-1 flex flex-col">
-      <!-- Mobile menu button -->
-      <button 
-        @click="isSidebarOpen = !isSidebarOpen"
-        class="block lg:hidden fixed top-4 left-4 z-50 p-2 rounded-md bg-gray-800 text-white hover:bg-gray-700 transition"
-      > 
-        <svg class="h-6 w-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"/>
-        </svg>
-      </button>
+  <!-- Mobile Sidebar (slide in/out) -->
+  <aside 
+    v-if="$route.path !== '/login'" 
+    :class="[
+      'fixed inset-y-0 left-0 z-50 w-64 bg-[#064E3B] text-white overflow-y-auto transform transition-transform duration-300 lg:hidden',
+      isSidebarOpen ? 'translate-x-0' : '-translate-x-full'
+    ]"
+  >
+    <Sidebar />
+  </aside>
 
-      <!-- Navbar -->
-      <header>
+  <!-- Main Content -->
+  <main class="flex-1 h-full overflow-y-auto flex flex-col">
+    <!-- Mobile Menu Button -->
+    <button 
+      @click="isSidebarOpen = !isSidebarOpen"
+      class="block lg:hidden fixed top-4 left-4 z-50 p-2 rounded-md bg-gray-800 text-white hover:bg-gray-700 transition"
+    > 
+      <!-- Icon -->
+      <svg class="h-6 w-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"/>
+      </svg>
+    </button>
+
+    <!-- Navbar -->
+    <header>
+      <div v-if="$route.path !== '/chatbot'">
         <Navbar />
-      </header>
-
-      <!-- Breadcrumb -->
-      <nav class="flex px-5 py-3 mb-4 text-gray-700 rounded-lg bg-gray-50 dark:bg-white" aria-label="Breadcrumb">
-        <ol class="inline-flex items-center space-x-1 md:space-x-2 rtl:space-x-reverse">
-          <!-- Breadcrumb items here -->
-        </ol>
-      </nav>
-
-      <!-- Router View (Main page content) -->
-      <div class="flex-grow">
-        <router-view></router-view>
       </div>
-    </main>
+    </header>
 
-  </div>
+    <!-- Breadcrumb -->
+    <nav class="flex px-5 py-3 mb-4 text-gray-700 rounded-lg bg-gray-50 dark:bg-white" aria-label="Breadcrumb">
+      <ol class="inline-flex items-center space-x-1 md:space-x-2 rtl:space-x-reverse">
+        <!-- Breadcrumb items -->
+      </ol>
+    </nav>
+
+    <!-- Page Content -->
+    <transition name="fade-slide" mode="out-in">
+      <router-view></router-view>
+    </transition>
+  </main>
+</div>
+
 </template>
 
 
@@ -85,4 +98,22 @@ header {
     flex-wrap: wrap;
   }
 }
+
+.fade-slide-enter-active,
+.fade-slide-leave-active {
+  transition: all 0.4s ease;
+}
+
+.fade-slide-enter-from,
+.fade-slide-leave-to {
+  opacity: 0;
+  transform: translateY(20px);
+}
+
+.fade-slide-enter-to,
+.fade-slide-leave-from {
+  opacity: 1;
+  transform: translateY(0);
+}
+
 </style>
