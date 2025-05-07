@@ -61,6 +61,7 @@
 <script>
 import axios from 'axios';
 import { useUserStore } from '../Stores/UserStore.vue';
+import Swal from 'sweetalert2';
 
 export default {
   data() {
@@ -98,7 +99,9 @@ export default {
         // Store token in localStorage (or use cookies if preferred)
         localStorage.setItem('token', response.data.token);
 
-        this.$router.push('/dashboard');  // Redirect to the dashboard
+        Swal.fire("Success!", "Successfully Logged in.", "success").then(() => {
+          this.$router.push('/dashboard');
+        });
 
       } catch (error) {
         console.error("Login failed:", error.response?.data?.message || error.message);

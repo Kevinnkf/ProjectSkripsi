@@ -1,5 +1,6 @@
 <script>
 import axios from 'axios';
+import Swal from 'sweetalert2';
 
 export default {
   data() {
@@ -7,11 +8,11 @@ export default {
       chatData: [], // Initialize an empty array to store the API data
       isModalOpen: false,
       newKnowledge: {
-        bk_id: "",
-        content: "",
-        notes: "",
-        created_at: new Date().toISOString(),
-        created_by: "Kevin", // Will change this to current user logged on later on
+        // bk_id: "",
+        file: "",
+        // notes: "",/
+        // created_at: new Date().toISOString(),
+        // created_by: "Kevin", // Will change this to current user logged on later on
       },
     };
   },
@@ -28,33 +29,42 @@ export default {
     },
 
     async onChangeFileUpload(event){
-      this.newKnowledge.content = event.target.files[0];
-      console.log("Selected file:", this.newKnowledge);
+      this.newKnowledge.file = event.target.files[0];
+      // console.log("Selected file:", this.newKnowledge);
     },
 
     async addKnowledge() {
-      if (!this.newKnowledge) {
-        alert("Please select a file first.");
+      if (!this.newKnowledge.file) {
+        Swal.fire("No File Selected", "Please select a file first.", "warning");
         return;
       }
 
       let formData = new FormData();
-      formData.append("content", this.newKnowledge.content); // File
-      formData.append("notes", this.newKnowledge.notes || ""); // Notes (optional)
-      formData.append("created_by", this.newKnowledge.created_by || "Unknown"); // Example additional fields
-
+      formData.append("file", this.newKnowledge.file); // File
+      // formData.append("notes", this.newKnowledge.notes || ""); // Notes (optional)
+      // formData.append("created_by", this.newKnowledge.created_by || "Unknown"); // Example additional fields
       console.log(formData)
-
+      
       try {
-        const response = await axios.post("http://localhost:5000/api/knowledge/post", formData, {
-          headers: {
-            "Content-Type": "multipart/form-data", // Important for file uploads!
-          },
-        });
-
-        console.log("Upload success:", response);
+        // const response = await axios.post("http://localhost:5000/api/knowledge/post", formData, {
+          //   headers: {
+            //     "Content-Type": "multipart/form-data", // Important for file uploads!
+            //   },
+            // });
+            const sendFile = await axios.post("http://localhost:8000/upload-pdf/", formData, {
+              headers: {
+                "Content-Type": "multipart/form-data", // Important for file uploads!
+              },
+            });
+            
+            // console.log("Upload success:", response);
+            console.log("Upload success:", sendFile);
+            Swal.fire("Success!", "PDF uploaded and processed successfully.", "success");
+            this.newKnowledge.file = "";
+            this.closeModal();
       } catch (error) {
         console.error("Error: ", error);
+        Swal.fire("Upload Failed", error.message || "Something went wrong", "error");
       }
     },
 
@@ -129,7 +139,7 @@ export default {
                 class="border border-gray-200 hover:bg-gray-100"
               >
                 <td class="px-4 py-2 border border-gray-200 text-gray-600">
-                  {{ item.bk_id }}
+                  {{ item.bk_id }}test
                 </td>
                 <td class="px-4 py-2 border border-gray-200 text-gray-600">
                   {{ item.filename }}
@@ -146,6 +156,7 @@ export default {
         </div>
 
         <!-- Modal -->
+        <transition name="modal-fade">
         <div
           v-show="isModalOpen"
           class="fixed inset-0 bg-gray-600 bg-opacity-50 flex justify-center items-center"
@@ -160,14 +171,14 @@ export default {
               </div>
 
               <!-- Notes Input -->
-              <div class="mb-4">
+              <!-- <div class="mb-4">
                 <label for="notes" class="block text-sm font-semibold">Notes</label>
                 <textarea
                   class="w-full p-2.5 border rounded"
                   v-model="newKnowledge.notes"
                   placeholder="Add notes here..."
                 ></textarea>
-              </div>
+              </div> -->
 
               <!-- Hidden Date Field -->
               <div class="mb-4 hidden">
@@ -192,7 +203,25 @@ export default {
             </form>
           </div>
         </div>
+      </transition>
       </div>
     </div>
   </div>
 </template>
+
+<style scoped>
+.modal-fade-enter-active,
+.modal-fade-leave-active {
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+.modal-fade-enter-from,
+.modal-fade-leave-to {
+  opacity: 0;
+  transform: translateY(-20px);
+}
+.modal-fade-enter-to,
+.modal-fade-leave-from {
+  opacity: 1;
+  transform: translateY(0);
+}
+</style>

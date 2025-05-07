@@ -34,7 +34,7 @@
               <th class="px-4 py-2 text-center font-bold uppercase border">NIPPM</th>
               <th class="px-4 py-2 text-center font-bold uppercase border">Role</th>
               <th class="px-4 py-2 text-center font-bold uppercase border">Time</th>
-              <th class="px-4 py-2 text-center font-bold uppercase border">Action</th>
+              <!-- <th class="px-4 py-2 text-center font-bold uppercase border">Action</th> -->
             </tr>
           </thead>
           <tbody>
@@ -46,7 +46,7 @@
               <td class="px-4 py-2 text-center border text-gray-600">{{ item.nippm }}</td>
               <td class="px-4 py-2 text-center border text-gray-600">{{ item.role }}</td>
               <td class="px-4 py-2 text-center border text-gray-600">{{ item.created_at }}</td>
-              <td class="px-4 py-2 text-center border text-gray-600">
+              <!-- <td class="px-4 py-2 text-center border text-gray-600">
                 <div class="flex justify-center gap-2">
                   <button
                     @click="editAdmin(item)"
@@ -61,17 +61,18 @@
                     Delete
                   </button>
                 </div>
-              </td>
+              </td> -->
             </tr>
           </tbody>
         </table>
       </div>
 
       <!-- Modal -->
-      <div
+      <transition name="modal-fade">
+        <div
         v-show="isModalOpen"
         class="fixed inset-0 bg-gray-600 bg-opacity-50 flex justify-center items-center z-50"
-      >
+        >
         <div class="bg-white p-6 rounded-md w-96 overflow-y-auto max-h-[90vh]">
           <h2 class="text-xl font-bold mb-4">Register New Admin</h2>
 
@@ -121,19 +122,20 @@
                 type="button"
                 @click="closeModal"
                 class="bg-gray-200 text-black px-4 py-2 rounded mr-2"
-              >
+                >
                 Back
               </button>
               <button
-                type="submit"
-                class="bg-green-800 text-white px-4 py-2 rounded"
+              type="submit"
+              class="bg-green-800 text-white px-4 py-2 rounded"
               >
-                Save
+              Save
               </button>
             </div>
           </form>
         </div>
       </div>
+     </transition>
     </div>
   </div>
 </template>
@@ -142,6 +144,7 @@
 
 <script>
 import axios from "axios";
+import Swal from "sweetalert2"
 
 export default {
   data() {
@@ -180,7 +183,7 @@ export default {
           this.newAdmin
         );
         console.log("Success:", response.data);
-
+        Swal.fire("Success!", "Admin has been registered", "success");
         // Refresh the table data
         await this.fetchData();
         this.closeModal();
@@ -188,7 +191,7 @@ export default {
         // Reset form
         this.newAdmin = { nippm: "", password: "", role: "", created_at: "" };
       } catch (error) {
-        console.error("Error posting admin:", error);
+        Swal.fire("Registering Admin Failed", error.message || "Something went wrong", "error");
       }
     },
     async fetchData() {
@@ -206,3 +209,20 @@ export default {
   },
 };
 </script>
+
+<style scoped>
+.modal-fade-enter-active,
+.modal-fade-leave-active {
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+.modal-fade-enter-from,
+.modal-fade-leave-to {
+  opacity: 0;
+  transform: translateY(-20px);
+}
+.modal-fade-enter-to,
+.modal-fade-leave-from {
+  opacity: 1;
+  transform: translateY(0);
+}
+</style>
