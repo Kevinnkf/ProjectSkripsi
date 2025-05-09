@@ -15,16 +15,24 @@ module.exports = (sequelize, DataTypes) => {
   }
   chat.init({
     chat_id: {type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true},
-    user_id: DataTypes.INTEGER,
-    user_message: DataTypes.STRING,
-    bot_response: DataTypes.STRING,
-    chat_time: DataTypes.DATE,
-    created_at: DataTypes.DATE
+    ipAddress: {type: DataTypes.STRING, allowNull: false},
+    user_message: {type: DataTypes.TEXT, allowNull: false},
+    bot_response: {type: DataTypes.TEXT, allowNull: false},
+    created_at: {type: DataTypes.DATE, defaultValue: DataTypes.NOW}
   }, {
     sequelize,
     modelName: 'Chat',
+    tableName: 'chats',
     underscored: true,
-    timestamps: false
+    timestamps: false,
+    indexes: [
+      {
+        fields: ['ipAddress']
+      },
+      {
+        fields: ['created_at']
+      }
+    ]
   });
   return chat;
 };

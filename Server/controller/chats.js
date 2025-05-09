@@ -5,36 +5,64 @@ const db = require('../models');
 const Chat = db.Chat
 
 
-// example using OPENAI
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
 
+// Middleware to IPAddress
+const getClientIp = (req) => {
+  return req.headers['x-forwarded-for']?.split(',')[0].trim() || 
+         req.connection.remoteAddress;
+};
+
+// Saving chat to databse
+const saveChat = async (ipAddress, userMessage, botResponse) =>{
+  return await Chat.create({
+    ipAddress: ipAddress,
+    user_message: userMessage,
+    bot_response: botResponse,
+    created_at: new Date()
+  })
+}
+
 const sendMessageToBot = async (req, res) => {
   try {
-    const { message } = req.body;
-    if (!message) {
-      return res.status(400).json({ error: "Message is required" });
+    const { message: userMessage } = req.body;
+    if (!userMessage || typeof userMessage !== 'string') {
+      return res.status(400).json({ error: "Valid message is required" });
     }
 
-    const response = await openai.chat.completions.create({
-      model: "gpt-4o-mini", // or "gpt-4" if you have access
-      messages: [{ role: "user", content: message }],
+    const ipAddress = getClientIp(req);
+    const history = await getChatHistory(ipAddress);
+    
+    // Prepare messages array in correct OpenAI format
+    const messages = history.map(chat => ({
+      role: "user",
+      content: chat.user_message
+    }));
+    
+    // Add current user message
+    messages.push({
+      role: "user",
+      content: userMessage
     });
-    const botResponse = response.choices[0].message.content
-    const user_id = 2107412040
 
-    const result = await Chat.create({
-      user_id: user_id,
-      user_message: message,
-      bot_response: botResponse,
-      chat_time: new Date(),
-      created_at: new Date(),
+    // Get bot response - using the correct API format
+    const completion = await openai.chat.completions.create({
+      model: "gpt-3.5-turbo",
+      messages: messages, // Properly formatted messages array
+      temperature: 0.7
     });
+
+    const botResponse = completion.choices[0].message.content;
+    
+    // Save to database
+    await saveChat(ipAddress, userMessage, botResponse);
 
     res.json({
+      userMessage: userMessage,
       botReply: botResponse,
-      message: result
+      ipAddress: ipAddress
     });
   } catch (error) {
     console.error("Error getting bot response:", error);
@@ -43,27 +71,30 @@ const sendMessageToBot = async (req, res) => {
   }
 };
 
-const getMessage = async (req, res) =>{
+// Get chat history by IP
+const getChatHistory = async (ipAddress) => {
+  return await Chat.findAll({
+    where: { ip_address: ipAddress },
+    order: [['created_at', 'ASC']],
+    attributes: ['user_message', 'bot_response', 'created_at']
+  });
+};
+
+const getMessageHistory = async (req, res) =>{
     try {
-        const result = await pool.query("SELECT * FROM chats")
-        res.json(result.rows)
-        
+        const ipAddress = getClientIp(req)
+        const chats = await getChatHistory(ipAddress)
+
+        console.log(ipAddress)
+
+        res.json({
+          ipAddress: ipAddress,
+          chats: chats
+        })
     } catch (error) {
         console.error('error fetching chats', error)
         res.status(500).json({error: 'Failed fetching chats' })
     }
 }
 
-const getMessageByChatId = async (req, res) => {
-  try{
-    const result = await pool.query ("SELECT * FROM chats where chat_id = 3")
-    res.json(result.rows)
-  }catch(error){  
-    console.error("Error fetching message", error)
-    res.status(500).json({
-      error: 'Failed fetching messages'
-    })
-  }
-}
-
-module.exports = { sendMessageToBot, getMessage, getMessageByChatId };
+module.exports = { sendMessageToBot, getMessageHistory};

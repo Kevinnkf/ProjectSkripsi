@@ -58,8 +58,8 @@ const fetchChatHistory = async () => {
       feedbackMap.set(feedback.chat_id, feedback.response);
     });
 
-    // Merge feedback into chats
-    chatHistory.value = chatsResponse.data.map(chat => ({
+    const chats = chatsResponse.data.data || [];  // Adjust this to match the real structure
+    chatHistory.value = chats.map(chat => ({
       chat_id: chat.chat_id,
       user_message: chat.user_message,
       bot_response: chat.bot_response,
