@@ -33,7 +33,7 @@
     <div class="flex-col justify-between">
       <div class="p-6 pb-0 mb-2 bg-white rounded-t-2xl">
         <h1 class="text-2xl font-bold"> Chatbot response in the last 7 days</h1>
-        <p>Chat fot </p>
+        <!-- <p>Chat fot </p> -->
         <canvas id="myChart" width="400" height="100"></canvas>
       </div>
     </div>
@@ -123,24 +123,19 @@ export default {
       return days
     },
 
-    // countMessagesPerDay(data, days) {
-    //   return days.map(dayObj => {
-    //     const count = data.filter(chat =>
-    //       chat.createdAt.startsWith(dayObj.date)
-    //     ).length
-    //     return count
-    //   })
-    // },
-
     countMessagesPerDay(data, days) {
+      if (!Array.isArray(data)) {
+        console.warn("Expected 'data' to be an array but got:", data);
+        data = []; // fallback to empty array instead of breaking
+      }
+
       return days.map(dayObj => {
         const count = data.filter(chat => {
-          const createdAt = chat.createdAt || chat.created_at || '' // fallback
-          return typeof createdAt === 'string' && createdAt.startsWith(dayObj.date)
-        }).length
-        return count
-
-      })
+          const createdAt = chat.createdAt || chat.created_at || '';
+          return typeof createdAt === 'string' && createdAt.startsWith(dayObj.date);
+        }).length;
+        return count;
+      });
     },
 
     renderChart() {
@@ -164,7 +159,7 @@ export default {
             y: {
               beginAtZero: true,
               ticks: {
-                precision: 0, // avoid decimal numbers
+                precision: 0, 
               },
             },
           },
@@ -176,10 +171,12 @@ export default {
         const response = await fetch('http://localhost:5000/api/chats')
         const data = await response.json()
         this.chatData = data
+
+        const chatData = data.chats
         
         const dayObjects = this.getLast7DaysLabels()
         const labels = dayObjects.map(d => d.label)
-        const values = this.countMessagesPerDay(data, dayObjects)
+        const values = this.countMessagesPerDay(chatData, dayObjects)
 
         this.chart.data.labels = labels
         this.chart.data.datasets[0].data = values

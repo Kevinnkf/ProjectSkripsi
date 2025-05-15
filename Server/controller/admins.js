@@ -86,6 +86,20 @@ const registerAdmins = async (req, res) => {
   try {
     const { id, nippm, password, role } = req.body;
 
+    // Fetch user including password using scope
+      const user = await Admin.findOne({ where: { nippm } });
+
+      if (user) {
+          return res.status(401).json({ error: 'Aready registerd!' });
+      } 
+
+      // Compare password with hashed password
+      const isPasswordValid = await bcrypt.compare(password, user.password);
+
+      if (!isPasswordValid) {
+          return res.status(401).json({ error: 'Failed to login, Invalid NIPPM or password!' });
+      }
+
     const hashedPassword = await bcrypt.hash(password, 10);
 
     const newAdmin = await Admin.create({

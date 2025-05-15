@@ -15,7 +15,7 @@ module.exports = (sequelize, DataTypes) => {
   }
   admins.init({
     id: {type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true},
-    nippm: DataTypes.STRING,
+    nippm: DataTypes.INTEGER,
     password: DataTypes.STRING,
     role: DataTypes.STRING,
     created_at: DataTypes.DATE,

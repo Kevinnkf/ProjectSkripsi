@@ -49,7 +49,7 @@ onMounted(() => {
     <!-- Navbar -->
     <header>
       <div v-if="$route.path !== '/chatbot'">
-        <Navbar />
+        <!-- <Navbar /> -->
       </div>
     </header>
 

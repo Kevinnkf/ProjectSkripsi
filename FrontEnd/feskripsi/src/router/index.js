@@ -6,14 +6,15 @@ import Admins from '@/components/Admins/IndexAdmin.vue'
 import Chatbot from '@/components/Chatbot.vue'
 import DefaultLayout from '@/Layout/DefaultLayout.vue'
 import BlankLayout from '@/Layout/BlankLayout.vue'
+import LandingPage from '@/components/Client/LandingPage.vue'
 
 const routes = [
-  { path: '/', redirect: '/dashboard', requiresAuth: true },
-  { path: '/login', name: 'login', component: Login, meta: { layout: BlankLayout } },
-  { path: '/base-knowledge', component: Index, meta: { layout: DefaultLayout, requiresAuth: true } },
-  { path: '/dashboard', component: Dashboard, meta: { layout: DefaultLayout, requiresAuth: true } },
-  { path: '/admins', component: Admins, meta: { layout: DefaultLayout, requiresAuth: true } },
-  { path: '/chatbot', component: Chatbot, meta: { layout: BlankLayout } },
+  { path: '/login', name: 'login', component: Login, meta: { layout: 'blank' } },
+  { path: '/base-knowledge', component: Index, meta: { layout: 'default', requiresAuth: true } },
+  { path: '/dashboard', component: Dashboard, meta: { layout: 'default', requiresAuth: true } },
+  { path: '/admins', component: Admins, meta: { layout: 'default', requiresAuth: true } },
+  { path: '/chatbot', component: Chatbot, meta: { layout: 'blank' } },
+  { path: '/hero', component: LandingPage, meta: { layout: 'blank' } },
   { path: '/:pathMatch(.*)*', component: Dashboard }, // Catch-all (optional)
 ]
 
