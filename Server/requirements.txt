@@ -1,0 +1,10 @@
+fastapi
+uvicorn[standard]
+langchain
+qdrant-client
+sentence-transformers
+python-dotenv
+langchain-community
+transformers
+accelerate
+sqlmodel
