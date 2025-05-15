@@ -1,29 +1,39 @@
-const pool = require('../config/db'); // Ensure this is the correct path to your DB config
-const { OpenAI } = require("openai");
-require("dotenv").config();
-const db = require('../models');
-const Chat = db.Chat
+import pool from '../config/db.js'; // Make sure your db config also uses ESM and exports default
+import { OpenAI } from "openai";
+import dotenv from "dotenv";
+import db from '../models/index.js';
 
+dotenv.config();
+
+const { Chat } = db;
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
 
-// Middleware to IPAddress
+// Middleware to get IP address
 const getClientIp = (req) => {
-  return req.headers['x-forwarded-for']?.split(',')[0].trim() || 
-         req.connection.remoteAddress;
+  return req.headers['x-forwarded-for']?.split(',')[0].trim() ||
+         req.connection?.remoteAddress ||
+         req.socket?.remoteAddress ||
+         null;
 };
 
-// Saving chat to databse
-const saveChat = async (ipAddress, userMessage, botResponse) =>{
-  return await Chat.create({
-    ipAddress: ipAddress,
-    user_message: userMessage,
-    bot_response: botResponse,
-    created_at: new Date()
-  })
-}
+// Get chat history including both user and bot messages for context
+const getChatHistory = async (ipAddress) => {
+  const chats = await Chat.findAll({
+    where: { ip_address: ipAddress },
+    order: [['created_at', 'ASC']],
+    attributes: ['user_message', 'bot_response', 'created_at']
+  });
+
+  const messages = [];
+  for (const chat of chats) {
+    messages.push({ role: 'user', content: chat.user_message });
+    messages.push({ role: 'assistant', content: chat.bot_response });
+  }
+  return messages;
+};
 
 const sendMessageToBot = async (req, res) => {
   try {
@@ -35,66 +45,41 @@ const sendMessageToBot = async (req, res) => {
     const ipAddress = getClientIp(req);
     const history = await getChatHistory(ipAddress);
     
-    // Prepare messages array in correct OpenAI format
-    const messages = history.map(chat => ({
-      role: "user",
-      content: chat.user_message
-    }));
-    
-    // Add current user message
-    messages.push({
-      role: "user",
-      content: userMessage
-    });
+    const messages = [...history];
+    messages.push({ role: "user", content: userMessage });
 
-    // Get bot response - using the correct API format
     const completion = await openai.chat.completions.create({
       model: "gpt-3.5-turbo",
-      messages: messages, // Properly formatted messages array
+      messages,
       temperature: 0.7
     });
 
     const botResponse = completion.choices[0].message.content;
     
-    // Save to database
-    await saveChat(ipAddress, userMessage, botResponse);
-
-    res.json({
-      userMessage: userMessage,
-      botReply: botResponse,
-      ipAddress: ipAddress
+    await Chat.create({
+      ip_address: ipAddress,
+      user_message: userMessage,
+      bot_response: botResponse,
+      // created_at: new Date() // if timestamps enabled
     });
+
+    res.json({ userMessage, botReply: botResponse, ipAddress });
   } catch (error) {
     console.error("Error getting bot response:", error);
-    console.log(process.env.OPENAI_API_KEY);
     res.status(500).json({ error: "Failed to get bot response" });
   }
 };
 
-// Get chat history by IP
-const getChatHistory = async (ipAddress) => {
-  return await Chat.findAll({
-    where: { ip_address: ipAddress },
-    order: [['created_at', 'ASC']],
-    attributes: ['user_message', 'bot_response', 'created_at']
-  });
+const getMessageHistory = async (req, res) => {
+  try {
+    const ipAddress = getClientIp(req);
+    const chats = await getChatHistory(ipAddress);
+
+    res.json({ ipAddress, chats });
+  } catch (error) {
+    console.error('error fetching chats', error);
+    res.status(500).json({ error: 'Failed fetching chats' });
+  }
 };
 
-const getMessageHistory = async (req, res) =>{
-    try {
-        const ipAddress = getClientIp(req)
-        const chats = await getChatHistory(ipAddress)
-
-        console.log(ipAddress)
-
-        res.json({
-          ipAddress: ipAddress,
-          chats: chats
-        })
-    } catch (error) {
-        console.error('error fetching chats', error)
-        res.status(500).json({error: 'Failed fetching chats' })
-    }
-}
-
-module.exports = { sendMessageToBot, getMessageHistory};
+export { sendMessageToBot, getMessageHistory };

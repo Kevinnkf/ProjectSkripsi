@@ -1,15 +1,16 @@
-const pool = require('../config/db');
-const multer = require('multer');
-const fs = require('fs');
-const path = require('path');
-const { Op } = require('sequelize');
-const client = require ('@qdrant/js-client-rest');
+import pool from '../config/db.js';
+import multer from 'multer';
+import fs from 'fs';
+import path from 'path';
+import { Op } from 'sequelize';
+import { QdrantClient } from '@qdrant/js-client-rest';  // Assuming named export
+import db from '../models/index.js';
+import axios from 'axios';
 
-const db = require('../models');
 const bk = db.baseknowledge;
 
 // Set destination folder
-const uploadFolder = path.join(__dirname, '../uploads');
+const uploadFolder = path.resolve('uploads'); // Adjust __dirname usage in ESM context
 
 // Ensure upload folder exists
 if (!fs.existsSync(uploadFolder)) {
@@ -22,7 +23,7 @@ const storage = multer.diskStorage({
     cb(null, uploadFolder);
   },
   filename: (req, file, cb) => {
-    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
     cb(null, uniqueSuffix + '-' + file.originalname);
   }
 });
@@ -34,18 +35,18 @@ const getBaseKnowledge = async (req, res) => {
   try {
     const result = await bk.findAll();
     res.json(result);
-    // client = new QdrantClient(
-    //   url="https://48b49ac1-8387-42bb-b0d7-10587d2aa625.eu-west-1-0.aws.cloud.qdrant.io",
-    //   api_key="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhY2Nlc3MiOiJtIn0.1ugiYzO7TerHdVXROwWBNgIMkv3zMymBGeMrKXVvm68",
-    // )
-    // const hasil = await client.getCollections();
-    // console.log('test'); 
-    // console.log('List of collections:', hasil.collections);
 
+    // Example for Qdrant client usage if needed:
+    // const client = new QdrantClient({
+    //   url: "https://48b49ac1-8387-42bb-b0d7-10587d2aa625.eu-west-1-0.aws.cloud.qdrant.io",
+    //   apiKey: "your_api_key_here",
+    // });
+    // const collections = await client.getCollections();
+    // console.log('List of collections:', collections);
   } catch (error) {
     console.error('Error fetching knowledge:', error);
     res.status(500).json({ error: 'Failed to fetch knowledge' });
-  } 
+  }
 };
 
 // Post new knowledge
@@ -58,15 +59,12 @@ const postBaseKnowledge = async (req, res) => {
       return res.status(400).json({ error: "File is required" });
     }
 
-    // Save to DB
     const result = await bk.create({
       filename: file.filename,
       notes,
       created_by,
       created_at: new Date()
     });
-    
-  
 
     res.status(201).json({
       message: "Base knowledge added successfully",
@@ -88,10 +86,10 @@ const searchBaseKnowledge = async (req, res) => {
       }
     });
 
-    if(!file){
-      return "File does not exist, please check again"
+    if (!file) {
+      return res.status(404).json({ error: "File does not exist, please check again" });
     }
-    
+
     res.json(file);
   } catch (error) {
     console.error("Error searching files", error);
@@ -103,24 +101,25 @@ const searchBaseKnowledge = async (req, res) => {
 
 const upsertKnowledge = async (req, res) => {
   try {
-    const file = path.join(__dirname, '../uploads');
-    const content = fs.readFileSync(file, 'utf-8');
+    const filePath = path.join(uploadFolder, req.file.filename);
+    const content = fs.readFileSync(filePath, 'utf-8');
 
     const data = {
-      id: filename,
+      id: req.file.filename,  // or another unique identifier
       payload: {
         content: content,
-        filename: req.file.originalName
+        filename: req.file.originalname
       }
-    }
+    };
 
-    const response = await axios.post('https://48b49ac1-8387-42bb-b0d7-10587d2aa625.eu-west-1-0.aws.cloud.qdrant.io:6333/collections')
+    // Example axios call - adjust URL and body as needed
+    const response = await axios.post('https://48b49ac1-8387-42bb-b0d7-10587d2aa625.eu-west-1-0.aws.cloud.qdrant.io:6333/collections', data);
 
-
+    res.status(200).json({ message: 'Upsert successful', response: response.data });
   } catch (error) {
-    
+    console.error('Error in upsertKnowledge:', error);
+    res.status(500).json({ error: 'Failed to upsert knowledge' });
   }
-}
+};
 
-
-module.exports = { getBaseKnowledge, postBaseKnowledge, upload , searchBaseKnowledge};
+export { getBaseKnowledge, postBaseKnowledge, upload, searchBaseKnowledge, upsertKnowledge };

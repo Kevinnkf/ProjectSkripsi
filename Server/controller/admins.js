@@ -1,104 +1,107 @@
-const jwt = require('jsonwebtoken');
-const bcrypt = require('bcrypt');
-const pool = require('../config/db'); // Use CommonJS require
-const db = require("../models");
-const { Op } = require('sequelize');
+import jwt from 'jsonwebtoken';
+import bcrypt from 'bcrypt';
+import pool from '../config/db.js'; // Assuming this is ESM
+import db from '../models/index.js';
+import { Op } from 'sequelize';
+
 const Admin = db.admins;
 
-async function login(req, res) {
+export async function login(req, res) {
   const { nippm, password } = req.body;
 
   try {
-      // Fetch user including password using scope
-      const user = await Admin.findOne({ where: { nippm } });
+    // Fetch user including password using scope
+    const user = await Admin.findOne({ where: { nippm } });
 
-      if (!user) {
-          return res.status(401).json({ error: 'Failed to login, please register first!' });
-      } 
+    if (!user) {
+      return res.status(401).json({ error: 'Failed to login, please register first!' });
+    }
 
-      // Compare password with hashed password
-      const isPasswordValid = await bcrypt.compare(password, user.password);
+    // Compare password with hashed password
+    const isPasswordValid = await bcrypt.compare(password, user.password);
 
-      if (!isPasswordValid) {
-          return res.status(401).json({ error: 'Failed to login, Invalid NIPPM or password!' });
-      }
+    if (!isPasswordValid) {
+      return res.status(401).json({ error: 'Failed to login, Invalid NIPPM or password!' });
+    }
 
-      // Create token
-      const token = jwt.sign(
-          { id: user.id, role: user.role, nippm: user.nippm }, 
-          process.env.SECRET_ACCESS_TOKEN, 
-          { expiresIn: '20m' }
-      );
+    // Create token
+    const token = jwt.sign(
+      { id: user.id, role: user.role, nippm: user.nippm },
+      process.env.SECRET_ACCESS_TOKEN,
+      { expiresIn: '20m' }
+    );
 
-      // Cookie options
-      const cookieOptions = {
-          maxAge: 20 * 60 * 1000,
-          httpOnly: true,
-          secure: process.env.NODE_ENV === 'production',
-          sameSite: 'None'
-      };
+    // Cookie options
+    const cookieOptions = {
+      maxAge: 20 * 60 * 1000,
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'None'
+    };
 
-      res.cookie("SessionID", token, cookieOptions);
+    res.cookie('SessionID', token, cookieOptions);
 
-      // Remove password before sending user data
-      const { password: pwd, ...userData } = user.dataValues;
+    // Remove password before sending user data
+    const { password: pwd, ...userData } = user.dataValues;
 
-      const responseData = { ...userData, token };
-      return res.status(200).json(responseData);
+    const responseData = { ...userData, token };
+    return res.status(200).json(responseData);
   } catch (err) {
-      console.error(err);
-      return res.status(500).json({error: "Internal server error"});
-      
+    console.error(err);
+    return res.status(500).json({ error: 'Internal server error' });
   }
 }
 
-const deleteById = async(req, res)=>{
+export async function logout(req, res) {
+  res.clearCookie('SessionID', {
+    httpOnly: true,
+    sameSite: 'none',
+    secure: process.env.NODE_ENV === 'production',
+  });
+  res.status(200).json({ message: 'Logout success' });
+}
+
+export async function deleteById(req, res) {
   try {
     const findById = await Admin.findByPk(req.params.id);
+    if (!findById) {
+      return res.status(404).json({ message: 'User not found' });
+    }
 
-    const result = await findById.destroy()
+    const result = await findById.destroy();
 
     res.json(result);
     console.log(result);
-    
-    
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: "Error deleting user" });
-    
+    res.status(500).json({ message: 'Error deleting user' });
   }
 }
 
-const findAll = async(req, res)=>{
+export async function findAll(req, res) {
   try {
     const result = await Admin.findAll();
     res.json(result);
     console.log(result);
   } catch (error) {
-    console.error("Error", error);
+    console.error('Error', error);
     res.status(500).json({
-      err: 'Failed: ' + error.message
+      err: 'Failed: ' + error.message,
     });
-  };
-};  
+  }
+}
 
-const registerAdmins = async (req, res) => {
+export async function registerAdmins(req, res) {
   try {
     const { id, nippm, password, role } = req.body;
 
-    // Fetch user including password using scope
-      const user = await Admin.findOne({ where: { nippm } });
+    const user = await Admin.findOne({ where: { nippm } });
 
-      if (user) {
-          return res.status(401).json({ error: 'Aready registerd!' });
-      } 
+    if (user) {
+      return res.status(401).json({ error: 'Already registered!' });
+    }
 
-      // Compare password with hashed password
-      const isPasswordValid = await bcrypt.compare(password, user.password);
-
-      if (!isPasswordValid) {
-          return res.status(401).json({ error: 'Failed to login, Invalid NIPPM or password!' });
-      }
+    // No need to compare password here since user doesn't exist yet
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
@@ -110,39 +113,46 @@ const registerAdmins = async (req, res) => {
     });
 
     res.status(201).json({
-      message: "Registered successfully",
+      message: 'Registered successfully',
       admin: newAdmin,
     });
   } catch (error) {
-    console.error("Error registering admin", error);
-    console.log("Request Body: ", req.body);
+    console.error('Error registering admin', error);
+    console.log('Request Body: ', req.body);
 
     if (!res.headersSent) {
       res.status(500).json({
-        error: "Failed to register",
+        error: 'Failed to register',
         detail: error.message,
       });
     }
   }
-};
+}
 
-const searchAdmins = async (req, res ) => {
+export async function resetPassword(req, res) {
+  try {
+    const { id, nippm, password, role } = req.body;
+    // Implement reset password logic here
+  } catch (error) {
+    console.error('Error resetting password', error);
+    res.status(500).json({ error: 'Failed to reset password' });
+  }
+}
+
+export async function searchAdmins(req, res) {
   try {
     const admin = await Admin.findOne({
       where: {
         nippm: {
-          [Op.iLike]: `%${req.params.nippm}%` // Case-insensitive match
-        }
-      }
+          [Op.iLike]: `%${req.params.nippm}%`, // Case-insensitive match
+        },
+      },
     });
     res.json(admin);
   } catch (error) {
-    console.error("Erorr searching admin", error)
+    console.error('Error searching admin', error);
     res.status(500).json({
-      error: "failed" + error.message
-    })
+      error: 'Failed: ' + error.message,
+    });
   }
 }
-
-
-module.exports = {registerAdmins, findAll, deleteById, login, searchAdmins}; // Correct CommonJS export

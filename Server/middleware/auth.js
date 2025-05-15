@@ -1,22 +1,32 @@
-import jwt from "jsonwebtoken";
-import User from "../models/admins"
+import jwt from 'jsonwebtoken';
+import db from "../models/index.js"; // Make sure your models/index.js uses `export default`
 
-export const isAuthenticated = async(req, res, next) => {
-    const token = req.cookies.SessionID;
-    if(!token){
-        return res.status(401).json({
-            status: 'failed',
-            message: 'unauthorized access',
-        });
+const User = db.admins;
+
+export const isAuthenticated = async (req, res, next) => {
+  const token = req.cookies?.SessionID;
+
+  if (!token) {
+    return res.status(401).json({
+      status: "failed",
+      message: "Unauthorized access",
+    });
+  }
+
+  try {
+    const decoded = jwt.verify(token, process.env.SECRET_ACCESS_TOKEN);
+
+    const user = await User.findByPk(decoded.id);
+    if (!user) {
+      return res.status(401).json({ message: "User not found" });
     }
-    try {
-        const decoded = jwt.verify(token, process.env.SECRET_ACCESS_TOKEN);
-        req.user = await User.findById(decoded); // Find the user by ID
-        next()
-    } catch (err) {
-        res.status(401).json({
-            status: 'failed', 
-            message: 'Invalid token' 
-        });
-    }
-}
+
+    req.user = user; // attach user info to the request
+    next();
+  } catch (err) {
+    return res.status(401).json({
+      status: "failed",
+      message: "Invalid or expired token",
+    });
+  }
+};

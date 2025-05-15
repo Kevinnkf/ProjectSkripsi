@@ -1,10 +1,10 @@
-const express = require('express');
-const { getBaseKnowledge, postBaseKnowledge, upload, searchBaseKnowledge } = require('../controller/baseKnowledge'); 
+import express from 'express';
+import { getBaseKnowledge, postBaseKnowledge, upload, searchBaseKnowledge } from '../controller/baseKnowledge.js';
 
 const router = express.Router();
 
 router.get('/', getBaseKnowledge);
-router.get('/:filename', searchBaseKnowledge)
-router.post("/post", upload.single("content"), postBaseKnowledge);
+router.get('/:filename', searchBaseKnowledge);
+router.post('/post', upload.single('content'), postBaseKnowledge);
 
-module.exports = router;
+export default router;
