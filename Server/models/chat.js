@@ -1,24 +1,18 @@
-'use strict';
-const {
-  Model
-} = require('sequelize');
-module.exports = (sequelize, DataTypes) => {
-  class chat extends Model {
-    /**
-     * Helper method for defining associations.
-     * This method is not a part of Sequelize lifecycle.
-     * The `models/index` file will call this method automatically.
-     */
+import { Model } from 'sequelize';
+
+export default (sequelize, DataTypes) => {
+  class Chat extends Model {
     static associate(models) {
       // define association here
     }
   }
-  chat.init({
-    chat_id: {type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true},
-    ipAddress: {type: DataTypes.STRING, allowNull: false},
-    user_message: {type: DataTypes.TEXT, allowNull: false},
-    bot_response: {type: DataTypes.TEXT, allowNull: false},
-    created_at: {type: DataTypes.DATE, defaultValue: DataTypes.NOW}
+
+  Chat.init({
+    chat_id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
+    ipAddress: { type: DataTypes.STRING, allowNull: false },
+    user_message: { type: DataTypes.TEXT, allowNull: false },
+    bot_response: { type: DataTypes.TEXT, allowNull: false },
+    created_at: { type: DataTypes.DATE, defaultValue: DataTypes.NOW }
   }, {
     sequelize,
     modelName: 'Chat',
@@ -34,5 +28,6 @@ module.exports = (sequelize, DataTypes) => {
       }
     ]
   });
-  return chat;
+
+  return Chat;
 };

@@ -1,17 +1,18 @@
-const express = require('express');
+import express from 'express';
 
-const adminsRoutes = require('./admins');
-const knowledgeRoutes = require('./baseKnowledge');
-const authRoutes = require('./auth');
-const chatRoutes = require('./chats');
-const feedbackRoutes = require('./feedback')
+import adminsRoutes from './admins.js';
+import knowledgeRoutes from './baseKnowledge.js';
+import authRoutes from './auth.js';
+import chatRoutes from './chats.js';
+import feedbackRoutes from './feedback.js';
+import { isAuthenticated } from '../middleware/auth.js';
 
 const router = express.Router();
 
-router.use('/api/chats', chatRoutes);
-router.use('/api/knowledge', knowledgeRoutes);
-router.use('/api/admins', adminsRoutes);
 router.use('/api/auth', authRoutes);
-router.use('/api/feedback', feedbackRoutes)
+router.use('/api/chats', chatRoutes);
+router.use('/api/feedback', feedbackRoutes);
+router.use('/api/knowledge', isAuthenticated, knowledgeRoutes);
+router.use('/api/admins', adminsRoutes);
 
-module.exports = router;
+export default router;
