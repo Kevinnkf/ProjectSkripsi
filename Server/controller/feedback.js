@@ -1,15 +1,15 @@
-import pool from '../config/db.js'; 
-import { OpenAI } from "openai";
-import dotenv from "dotenv";
-import db from '../models/index.js';
+const pool = require('../config/db'); // Ensure this is the correct path to your DB config
+// const { OpenAI } = require("openai");
+require("dotenv").config();
+const db = require('../models');
+const Feedback = db.Feedback
 
 dotenv.config();
 
-const { Feedback } = db;
-
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-});
+// example using OPENAI
+// const openai = new OpenAI({
+//   apiKey: process.env.OPENAI_API_KEY,
+// });
 
 const getFeedback = async (req, res) => {
   try {

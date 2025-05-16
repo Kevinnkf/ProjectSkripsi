@@ -13,8 +13,8 @@ const port = 5000;
 
 // CORS configuration
 const corsOptions = {
-  origin: 'http://localhost:5173', // Replace with your frontend's URL
-  credentials: true, // Allow cookies to be sent and received
+  origin: 'http://localhost:5173', // frontend's URL
+  credentials: true // Allow cookies to be sent and received
 };
 
 // Use the CORS middleware with the configured options

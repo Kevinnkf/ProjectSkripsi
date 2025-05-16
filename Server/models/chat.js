@@ -21,7 +21,7 @@ export default (sequelize, DataTypes) => {
     timestamps: false,
     indexes: [
       {
-        fields: ['ipAddress']
+        fields: ['ip_address']
       },
       {
         fields: ['created_at']
