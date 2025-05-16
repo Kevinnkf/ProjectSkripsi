@@ -46,14 +46,14 @@ export default {
       console.log(formData)
       
       try {
-        // const response = await axios.post("http://localhost:5000/api/knowledge/post", formData, {
-          //   headers: {
+            // const response = await axios.post("http://localhost:5000/api/knowledge/post", formData, {
+             //   headers: {
             //     "Content-Type": "multipart/form-data", // Important for file uploads!
             //   },
             // });
             const sendFile = await axios.post("http://localhost:8000/upload-pdf/", formData, {
               headers: {
-                "Content-Type": "multipart/form-data", // Important for file uploads!
+                "Content-Type": "multipart/form-data", 
               },
             });
             

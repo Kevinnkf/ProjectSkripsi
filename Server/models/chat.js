@@ -9,7 +9,7 @@ export default (sequelize, DataTypes) => {
 
   Chat.init({
     chat_id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
-    ipAddress: { type: DataTypes.STRING, allowNull: false },
+    ip_address: { type: DataTypes.STRING, allowNull: false },
     user_message: { type: DataTypes.TEXT, allowNull: false },
     bot_response: { type: DataTypes.TEXT, allowNull: false },
     created_at: { type: DataTypes.DATE, defaultValue: DataTypes.NOW }
