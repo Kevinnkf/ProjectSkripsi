@@ -1,31 +1,32 @@
+// index.js
 import express from 'express';
-import cors from 'cors';
+import cors    from 'cors';
 import bodyParser from 'body-parser';
-import cookieParser from 'cookie-parser';
-import router from './routes/index.js'; 
-import db from './models/index.js'; 
+import router  from './routes/index.js';
+import db      from './models/index.js'; 
+import dotenv  from 'dotenv';
 
-import dotenv from 'dotenv';
 dotenv.config();
 
-const app = express();
-const port = 5000;
+const app  = express();
+const port = process.env.PORT || 5000;
 
-// CORS configuration
-const corsOptions = {
-  origin: 'http://localhost:5173', // frontend's URL
-  credentials: true // Allow cookies to be sent and received
-};
+// Allow your frontend to talk to this API
+app.use(cors({
+  origin:      'http://localhost:5173',
+  credentials: true
+}));
 
-// Use the CORS middleware with the configured options
-app.use(cors(corsOptions));
-app.use(cookieParser()); // Required to read cookies
+// parse JSON bodies
 app.use(bodyParser.json());
-app.use(router); // Use the router from routes/index.js
 
-db.sequelize.sync().then(() => {
-  console.log('Database synced');
-});
+// mount all routes
+app.use(router);
+
+// sync your Sequelize models
+db.sequelize.sync()
+  .then(() => console.log('Database synced'))
+  .catch(e => console.error('DB sync error:', e));
 
 app.listen(port, () => {
   console.log(`Server listening on port ${port}`);

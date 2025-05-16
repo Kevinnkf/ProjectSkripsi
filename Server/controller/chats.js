@@ -1,96 +1,66 @@
-const axios = require('axios');
-require('dotenv').config();
+import axios from 'axios';
+import dotenv from 'dotenv';
+import db     from '../models/index.js';
 
-const db   = require('../models');
+dotenv.config();
+
 const Chat = db.Chat;
+const RAG_URL = process.env.RAG_SERVICE_URL || 'http://localhost:8000';
 
-// RAG endpoint 
-const RAG_URL = process.env.RAG_SERVICE_URL || 'http://127.0.0.1:8000';
-
-// client IP 
-const getClientIp = req => {
-  const forwarded = req.headers['x-forwarded-for'];
-  let ip = forwarded
-    ? forwarded.split(',')[0].trim()
-    : req.socket.remoteAddress;
-
-  // strip IPv4-mapped IPv6 prefix
-  if (ip.startsWith('::ffff:')) {
-    ip = ip.replace('::ffff:', '');
-  }
-  // map pure IPv6 loopback to IPv4
-  if (ip === '::1') {
-    ip = '127.0.0.1';
-  }
+// normalize IPv4/IPv6
+export function getClientIp(req) {
+  const fwd = req.headers['x-forwarded-for'];
+  let ip   = fwd ? fwd.split(',')[0].trim() : req.socket.remoteAddress;
+  if (ip.startsWith('::ffff:')) ip = ip.replace('::ffff:', '');
+  if (ip === '::1') ip = '127.0.0.1';
   return ip;
-};
+}
 
-// Get chat history by IP
-const getChatHistory = async (ipAddress) => {
-  return await Chat.findAll({
-    where: { ip_address: ipAddress },
-    order: [['created_at', 'ASC']],
-    attributes: ['user_message', 'bot_response', 'created_at']
+async function _getChatHistory(ip) {
+  return Chat.findAll({
+    where:      { ipAddress: ip },
+    order:      [['created_at','ASC']],
+    attributes: ['user_message','bot_response','created_at']
   });
-};
+}
 
-// save a chat record
-const saveChat = async (ipAddress, userMessage, botResponse) => {
+async function _saveChat(ip, userMessage, botResponse) {
   return Chat.create({
-    ipAddress,
+    ipAddress:    ip,
     user_message: userMessage,
     bot_response: botResponse,
     created_at:   new Date()
   });
-};
+}
 
-// send user message → RAG service → save & reply
-const sendMessageToBot = async (req, res) => {
+export async function sendMessageToBot(req, res) {
   try {
     const { message: userMessage } = req.body;
-    if (!userMessage || typeof userMessage !== 'string') {
+    if (!userMessage) {
       return res.status(400).json({ error: 'Valid message is required' });
     }
 
-    const ipAddress = getClientIp(req);
-    const history = await getChatHistory(ipAddress);
+    const ip = getClientIp(req);
 
-    // FastAPI RAG endpoint
-    const ragRes = await axios.post(
-      `${RAG_URL}/api/query`,
-      { query: userMessage }
-    );
+    // call your local RAG API
+    const { data } = await axios.post(`${RAG_URL}/api/query`, { query: userMessage });
+    const botResponse = data.answer;
 
-    const botResponse = ragRes.data.answer;
-    await saveChat(ipAddress, userMessage, botResponse);
+    await _saveChat(ip, userMessage, botResponse);
 
-    return res.json({
-      userMessage,
-      botReply: botResponse,
-      ipAddress
-    });
+    return res.json({ userMessage, botReply: botResponse, ipAddress: ip });
   } catch (err) {
     console.error('❌ sendMessageToBot error:', err);
     return res.status(500).json({ error: 'Failed to get bot response' });
   }
-};
-
-// expose all chat history
-const getMessageHistory = async (req, res) => {
-  try {
-        const ipAddress = getClientIp(req)
-        const chats = await getChatHistory(ipAddress)
-
-        console.log(ipAddress)
-
-        res.json({
-          ipAddress: ipAddress,
-          chats: chats
-        })
-    } catch (error) {
-        console.error('error fetching chats', error)
-        res.status(500).json({error: 'Failed fetching chats' })
-    }
 }
 
-module.exports = { sendMessageToBot, getMessageHistory };
+export async function getMessageHistory(req, res) {
+  try {
+    const chats = await _getChatHistory(getClientIp(req));
+    return res.json({ chats });
+  } catch (err) {
+    console.error('❌ getMessageHistory error:', err);
+    return res.status(500).json({ error: 'Failed fetching chats' });
+  }
+}

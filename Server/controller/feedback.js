@@ -1,48 +1,39 @@
-const pool = require('../config/db'); // Ensure this is the correct path to your DB config
-// const { OpenAI } = require("openai");
-require("dotenv").config();
-const db = require('../models');
-const Feedback = db.Feedback
+import dotenv from 'dotenv';
+import db from '../models/index.js';
 
 dotenv.config();
 
-// example using OPENAI
-// const openai = new OpenAI({
-//   apiKey: process.env.OPENAI_API_KEY,
-// });
+const { Feedback } = db;
 
-const getFeedback = async (req, res) => {
+//GET /api/feedback
+export async function getFeedback(req, res) {
   try {
-    const feedback = await Feedback.findAll();
-    res.json(feedback);
+    const all = await Feedback.findAll();
+    return res.json(all);
   } catch (err) {
-    res.status(500).json({ message: err.message });
+    console.error('❌ getFeedback error:', err);
+    return res.status(500).json({ error: err.message });
   }
-};
+}
 
-const sendFeedback = async (req, res) => {
+// POST /api/feedback/post
+export async function sendFeedback(req, res) {
   try {
     const { chat_id, response } = req.body;
 
-    // Check if required fields exist
     if (!chat_id || !response) {
       return res.status(400).json({ error: 'chat_id and response are required' });
     }
-
-    // Validate response value
     if (!['good', 'bad'].includes(response)) {
-      return res.status(400).json({ error: 'response must be either "good" or "bad"' });
+      return res.status(400).json({ error: 'response must be "good" or "bad"' });
     }
 
-    // Check if feedback already exists
-    const existingFeedback = await Feedback.findOne({ where: { chat_id } });
-
-    if (existingFeedback) {
+    const existing = await Feedback.findOne({ where: { chat_id } });
+    if (existing) {
       return res.status(400).json({ error: 'Feedback for this chat_id already exists' });
     }
 
-    // Save new feedback
-    const result = await Feedback.create({
+    const record = await Feedback.create({
       chat_id,
       response,
       created_at: new Date(),
@@ -50,13 +41,10 @@ const sendFeedback = async (req, res) => {
 
     return res.status(201).json({
       message: 'Feedback submitted successfully',
-      feedback: result,
+      feedback: record,
     });
-
-  } catch (error) {
-    console.error(error);
+  } catch (err) {
+    console.error('❌ sendFeedback error:', err);
     return res.status(500).json({ error: 'Internal server error' });
   }
-};
-
-export { sendFeedback, getFeedback };
+}
