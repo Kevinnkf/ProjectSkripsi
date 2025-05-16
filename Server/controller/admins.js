@@ -132,7 +132,8 @@ export async function registerAdmins(req, res) {
 export async function resetPassword(req, res) {
   try {
     const { id, nippm, password, role } = req.body;
-    // Implement reset password logic here
+    
+    
   } catch (error) {
     console.error('Error resetting password', error);
     res.status(500).json({ error: 'Failed to reset password' });
