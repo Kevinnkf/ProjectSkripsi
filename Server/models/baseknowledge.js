@@ -17,6 +17,7 @@ export default (sequelize, DataTypes) => {
     freezeTableName: true,
     modelName: 'baseknowledge',
     underscored: true,
+    timestamps: false 
   });
   return Baseknowledge;
 };

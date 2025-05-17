@@ -1,6 +1,7 @@
 <script>
 import axios from 'axios';
 import Swal from 'sweetalert2';
+import api from '../../services/axios.js'; 
 
 export default {
   data() {
@@ -46,16 +47,18 @@ export default {
       console.log(formData)
       
       try {
-            // const response = await axios.post("http://localhost:5000/api/knowledge/post", formData, {
-             //   headers: {
-            //     "Content-Type": "multipart/form-data", // Important for file uploads!
+            const sendFile = await api.post('knowledge/post', formData, {
+              headers: {
+                'Content-Type': 'multipart/form-data'
+              }
+            });
+            // const sendFile = await axios.post("http://localhost:8000/upload-pdf/", formData, {
+            //   headers: {
+            //     "Content-Type": "multipart/form-data", 
             //   },
             // });
-            const sendFile = await axios.post("http://localhost:8000/upload-pdf/", formData, {
-              headers: {
-                "Content-Type": "multipart/form-data", 
-              },
-            });
+
+            
             
             // console.log("Upload success:", response);
             console.log("Upload success:", sendFile);
@@ -71,8 +74,9 @@ export default {
 
     async fetchKnowledgeData() {
       try {
-        const response = await fetch("http://localhost:5000/api/knowledge");
+        const response = await api.get("/knowledge");
         const data = await response.json();
+        console.log(data)
         this.tableData = data;
       } catch (error) {
         console.error("Error fetching data:", error);

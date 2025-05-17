@@ -1,5 +1,6 @@
-// index.js
+
 import express from 'express';
+import cookieParser from 'cookie-parser';
 import cors    from 'cors';
 import bodyParser from 'body-parser';
 import router  from './routes/index.js';
@@ -9,12 +10,15 @@ import dotenv  from 'dotenv';
 dotenv.config();
 
 const app  = express();
+app.use(express.json()); // For JSON body parsing
+app.use(cookieParser()); // For cookie parsing
 const port = process.env.PORT || 5000;
 
 // Allow your frontend to talk to this API
 app.use(cors({
   origin:      'http://localhost:5173',
-  credentials: true
+  credentials: true,
+  allowedHeaders: ['Authorization', 'Content-Type']
 }));
 
 // parse JSON bodies
