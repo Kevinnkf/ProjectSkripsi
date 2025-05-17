@@ -18,7 +18,7 @@ export function getClientIp(req) {
 
 async function _getChatHistory(ip) {
   return Chat.findAll({
-    where:      { ipAddress: ip },
+    where:      { ip_address: ip },
     order:      [['created_at','ASC']],
     attributes: ['user_message','bot_response','created_at']
   });
@@ -26,7 +26,7 @@ async function _getChatHistory(ip) {
 
 async function _saveChat(ip, userMessage, botResponse) {
   return Chat.create({
-    ipAddress:    ip,
+    ip_address:    ip,
     user_message: userMessage,
     bot_response: botResponse,
     created_at:   new Date()
