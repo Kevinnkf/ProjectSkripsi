@@ -50,7 +50,7 @@ export async function sendMessageToBot(req, res) {
 
     return res.json({ userMessage, botReply: botResponse, ipAddress: ip });
   } catch (err) {
-    console.error('❌ sendMessageToBot error:', err);
+    console.error('sendMessageToBot error:', err);
     return res.status(500).json({ error: 'Failed to get bot response' });
   }
 }
@@ -60,7 +60,7 @@ export async function getMessageHistory(req, res) {
     const chats = await _getChatHistory(getClientIp(req));
     return res.json({ chats });
   } catch (err) {
-    console.error('❌ getMessageHistory error:', err);
+    console.error(' getMessageHistory error:', err);
     return res.status(500).json({ error: 'Failed fetching chats' });
   }
 }

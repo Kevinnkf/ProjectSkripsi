@@ -1,35 +1,29 @@
 'use strict';
 /** @type {import('sequelize-cli').Migration} */
 export async function up(queryInterface, Sequelize) {
-  await queryInterface.createTable('admins', {
+  await queryInterface.createTable('faqs', {
     id: {
       allowNull: false,
       autoIncrement: true,
       primaryKey: true,
       type: Sequelize.INTEGER
     },
-    nippm: {
-      allowNull: false,
-      type: Sequelize.INTEGER
+    question: {
+      type: Sequelize.TEXT
     },
-    password: {
-      allowNull: false,
-      type: Sequelize.STRING
+    answer: {
+      type: Sequelize.TEXT
     },
-    role: {
-      allowNull: false,
-      type: Sequelize.STRING
-    },
-    created_at: {
+    createdAt: {
       allowNull: false,
       type: Sequelize.DATE
     },
-    updated_at: {
-      allowNull: true,
+    updatedAt: {
+      allowNull: false,
       type: Sequelize.DATE
     }
   });
 }
 export async function down(queryInterface, Sequelize) {
-  await queryInterface.dropTable('admins');
+  await queryInterface.dropTable('faqs');
 }
