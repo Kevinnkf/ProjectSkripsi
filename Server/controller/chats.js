@@ -55,7 +55,17 @@ export async function sendMessageToBot(req, res) {
   }
 }
 
-export async function getMessageHistory(req, res) {
+export async function getAllChatHistory(req, res) {
+  try {
+    const chats = await Chat.findAll()
+    return res.json({ chats });
+  } catch (err) {
+    console.error(' getMessageHistory error:', err);
+    return res.status(500).json({ error: 'Failed fetching chats' });
+  }
+}
+
+export async function getMessageHistoryByIp(req, res) {
   try {
     const chats = await _getChatHistory(getClientIp(req));
     return res.json({ chats });
