@@ -2,74 +2,67 @@
   <div class="p-6 bg-white rounded-2xl shadow-soft-xl">
     <!-- Intro Section -->
     <div class="p-6">
-      <h1 class="text-2xl font-bold">Admins Page</h1>
+      <h1 class="text-3xl font-bold text-black mb-2 drop-shadow">Admins Page</h1>
       <p>Welcome to the Admins section!</p>
     </div>
 
     <!-- Header & Action -->
     <div class="flex items-center justify-between mb-4 px-6">
-      <h2 class="text-xl font-semibold">List of Active Admins</h2>
+      <h2 class="text-xl font-semibold text-black mb-2 drop-shadow">List of Active Admins</h2>
       <button
         @click="openModal"
-        class="px-4 py-2 bg-green-800 hover:bg-green-600 text-white rounded-lg transition"
+        class="inline-flex items-center px-4 py-2 bg-green-100 text-[#064E3B] hover:bg-green-200 border border-bg-[#064E3B] rounded-lg shadow transition font-semibold"
       >
+        <svg class="w-5 h-5 mr-2 text-[#064E3B]" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/>
+        </svg>
         Register Admin
       </button>
     </div>
 
     <!-- Data Table -->
     <div class="overflow-x-auto px-6 pb-6">
-      <table
-        id="data-table"
-        class="table-fixed w-full border-collapse border border-gray-200 text-slate-500"
-      >
-        <thead class="bg-gray-100">
-          <tr>
-            <th class="px-4 py-2 text-center font-bold uppercase border">NIPPM</th>
-            <th class="px-4 py-2 text-center font-bold uppercase border">Role</th>
-            <th class="px-4 py-2 text-center font-bold uppercase border">Time</th>
-            <!-- <th class="px-4 py-2 text-center font-bold uppercase border">Action</th> -->
-          </tr>
-        </thead>
-        <tbody>
-          <tr
-            v-for="(item, index) in tableData"
-            :key="index"
-            class="border border-gray-200 hover:bg-gray-100"
-          >
-            <td class="px-4 py-2 text-center border text-gray-600">{{ item.nippm }}</td>
-            <td class="px-4 py-2 text-center border text-gray-600">{{ item.role }}</td>
-            <td class="px-4 py-2 text-center border text-gray-600">{{ item.created_at }}</td>
-            <!-- <td class="px-4 py-2 text-center border text-gray-600">
-                <div class="flex justify-center gap-2">
-                  <button
-                    @click="editAdmin(item)"
-                    class="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg transition"
-                  >
-                    Edit
-                  </button>
-                  <button
-                    @click="deleteAdmin(item)"
-                    class="px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded-lg transition"
-                  >
-                    Delete
-                  </button>
-                </div>
-              </td> -->
-          </tr>
-        </tbody>
-      </table>
+      <div class="shadow-lg rounded-2xl border border-gray-100 bg-white">
+        <table class="min-w-full rounded-2xl overflow-hidden">
+          <thead class="bg-[#064E3B]">
+            <tr>
+              <th class="px-6 py-4 text-left font-bold uppercase text-xs text-white tracking-widest border-b">NIPPM</th>
+              <th class="px-6 py-4 text-left font-bold uppercase text-xs text-white tracking-widest border-b">Role</th>
+              <th class="px-6 py-4 text-left font-bold uppercase text-xs text-white tracking-widest border-b">Created At</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr
+              v-for="(item, index) in tableData"
+              :key="index"
+              class="transition-all duration-200 border-b last:border-0 hover:bg-blue-50 cursor-pointer even:bg-blue-50/50"
+            >
+              <td class="px-6 py-3 text-gray-700 font-mono">{{ item.nippm }}</td>
+              <td class="px-6 py-3 text-gray-800">
+                <span v-if="item.role === 'Super Admin'" class="inline-flex items-center px-2 py-1 bg-blue-100 text-blue-700 text-xs rounded-full font-semibold">
+                  <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6l4 2"/></svg>
+                  {{ item.role }}
+                </span>
+                <span v-else class="inline-flex items-center px-2 py-1 bg-green-100 text-green-700 text-xs rounded-full font-semibold">
+                  <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><circle cx="12" cy="12" r="6"/></svg>
+                  {{ item.role }}
+                </span>
+              </td>
+              <td class="px-6 py-3 text-gray-600 font-mono">{{ item.created_at }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
     </div>
 
     <!-- Modal -->
     <transition name="modal-fade">
       <div
         v-show="isModalOpen"
-        class="fixed inset-0 bg-gray-600 bg-opacity-50 flex justify-center items-center z-50"
+        class="fixed inset-0 bg-black/30 flex justify-center items-center z-50"
       >
-        <div class="bg-white p-6 rounded-md w-96 overflow-y-auto max-h-[90vh]">
-          <h2 class="text-xl font-bold mb-4">Register New Admin</h2>
-
+        <div class="bg-white p-8 rounded-2xl shadow-2xl max-w-md w-full border border-blue-200">
+          <h2 class="text-xl font-bold text-[#064E3B] mb-4">Register New Admin</h2>
           <form @submit.prevent="registerAdmin">
             <div class="mb-4">
               <label for="nippm" class="block text-sm font-semibold">NIPPM</label>
@@ -80,7 +73,6 @@
                 class="w-full p-2.5 border rounded"
               />
             </div>
-
             <div class="mb-4">
               <label for="password" class="block text-sm font-semibold">Password</label>
               <input
@@ -91,7 +83,6 @@
                 class="w-full p-2.5 border rounded"
               />
             </div>
-
             <div class="mb-4">
               <label for="role" class="block text-sm font-semibold">Role</label>
               <select
@@ -104,13 +95,11 @@
                 <option>Admin</option>
               </select>
             </div>
-
             <input
               type="datetime-local"
               v-model="newAdmin.created_at"
               class="hidden"
             />
-
             <div class="flex justify-end">
               <button
                 type="button"
@@ -217,5 +206,8 @@ export default {
 .modal-fade-leave-from {
   opacity: 1;
   transform: translateY(0);
+}
+table td, table th { 
+  word-break: break-word; 
 }
 </style>
