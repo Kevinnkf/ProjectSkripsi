@@ -3,7 +3,10 @@ import { Model } from 'sequelize';
 export default (sequelize, DataTypes) => {
   class Chat extends Model {
     static associate(models) {
-      // define association here
+      Chat.hasOne(models.Feedback, {
+        foreignKey: 'chat_id',
+        as: 'feedback'
+      });
     }
   }
 

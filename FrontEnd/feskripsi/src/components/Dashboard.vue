@@ -1,94 +1,88 @@
 <template>
-<div>
-  <div class="p-6">
-    <h1 class="text-2xl font-bold">Dashboard Page</h1>
-    <p>Welcome to the Dashboard section!</p>
-  </div>
+  <div class="p-6 bg-white rounded-2xl shadow-soft-xl">
+    <!-- Intro Section -->
+    <div class="p-6">
+      <h1 class="text-2xl font-bold">Dashboard Page</h1>
+      <p>Welcome to the Dashboard section!</p>
+    </div>
 
-  <div
-    class="relative flex flex-col w-full min-w-0 mb-0 break-words bg-white border-0 border-transparent border-solid shadow-soft-xl rounded-2xl bg-clip-border"
-  >
-    <div class="flex-row justify-between">
-      <div class="flex flex-wrap justify-between gap-4 p-6 bg-white">
-        <div
-          class="flex-1 max-w-sm p-6 bg-white border border-gray-200 rounded-lg shadow hover:bg-gray-100"
-        >
-          <h5 class="mb-2 text-2xl font-bold tracking-tight text-gray-900">Questions Asked</h5>
-          <p class="font-normal text-xl text-gray-700">{{}} 28</p>
-        </div>
-        <div
-          class="flex-1 max-w-sm p-6 bg-white border border-gray-200 rounded-lg shadow hover:bg-gray-100"
-        >
-          <h5 class="mb-2 text-2xl font-bold tracking-tight text-gray-900">Users per Day</h5>
-          <p class="font-normal text-xl text-gray-700">{{}} 30</p>
-        </div>
-        <div
-          class="flex-1 max-w-sm p-6 bg-white border border-gray-200 rounded-lg shadow hover:bg-gray-100"
-        >
-          <h5 class="mb-2 text-2xl font-bold tracking-tight text-gray-900">Base Knowledge</h5>
-          <p class="font-normal text-xl text-gray-700">{{}} 12</p>
-        </div>
+    <!-- Stats Cards -->
+    <div class="flex flex-wrap justify-between gap-4 p-6">
+      <div
+        class="flex-1 max-w-sm p-6 bg-white border border-gray-200 rounded-lg shadow hover:bg-gray-100"
+      >
+        <h5 class="mb-2 text-2xl font-bold tracking-tight text-gray-900">Questions Asked</h5>
+        <p class="font-normal text-xl text-gray-700">28</p>
+      </div>
+      <div
+        class="flex-1 max-w-sm p-6 bg-white border border-gray-200 rounded-lg shadow hover:bg-gray-100"
+      >
+        <h5 class="mb-2 text-2xl font-bold tracking-tight text-gray-900">Users per Day</h5>
+        <p class="font-normal text-xl text-gray-700">30</p>
+      </div>
+      <div
+        class="flex-1 max-w-sm p-6 bg-white border border-gray-200 rounded-lg shadow hover:bg-gray-100"
+      >
+        <h5 class="mb-2 text-2xl font-bold tracking-tight text-gray-900">Base Knowledge</h5>
+        <p class="font-normal text-xl text-gray-700">12</p>
       </div>
     </div>
-    <div class="flex-col justify-between">
-      <div class="p-6 pb-0 mb-2 bg-white rounded-t-2xl">
-        <h1 class="text-2xl font-bold"> Chatbot response in the last 7 days</h1>
-        <!-- <p>Chat fot </p> -->
-        <canvas id="myChart" width="400" height="100"></canvas>
-      </div>
-    </div>
-    <div class="flex-auto px-0 pt-0 pb-2 space-x-5">
-      <div class="p-4 overflow-x-auto">
-        <div class="p-6">
-          <h1 class="text-2xl font-bold">Frequently Asked Questions</h1>
-          <p>See what's user has been up to here</p>
-        </div>
 
-        <!-- Data Table -->
-        <table
-          id="data-table"
-          class="table-fixed w-full border-collapse border border-gray-200 text-slate-500"
-        >
-          <thead class="bg-gray-100">
-            <tr>
-              <th class="px-4 py-2 text-left font-bold uppercase border border-gray-200">
-                ID Chat
-              </th>
-              <th class="px-4 py-2 text-left font-bold uppercase border border-gray-200">
-                ID User
-              </th>
-              <th class="px-4 py-2 text-left font-bold uppercase border border-gray-200">
-                User Message
-              </th>
-              <th class="px-4 py-2 text-left font-bold uppercase border border-gray-200">
-                Bot Response
-              </th>
-              <th class="px-4 py-2 text-center font-bold uppercase border border-gray-200">Time</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr
-              v-for="(item, index) in tableData"
-              :key="index"
-              class="border border-gray-200 hover:bg-gray-100"
+    <!-- Chart Section -->
+    <div class="p-6">
+      <h2 class="text-xl font-semibold">Chatbot response in the last 7 days</h2>
+      <canvas id="myChart" width="400" height="100"></canvas>
+    </div>
+
+    <!-- FAQ Header -->
+    <div class="flex items-center justify-between mb-4 px-6">
+      <h2 class="text-xl font-semibold">Frequently Asked Questions</h2>
+    </div>
+
+    <!-- FAQ Table -->
+    <div class="overflow-x-auto px-6 pb-6">
+      <table
+        id="data-table"
+        class="table-fixed w-full border-collapse border border-gray-200 text-slate-500"
+      >
+        <thead class="bg-gray-100">
+          <tr>
+            <th class="px-4 py-2 text-left font-bold uppercase border border-gray-200">
+              ID Chat
+            </th>
+            <th class="px-4 py-2 text-left font-bold uppercase border border-gray-200">
+              ID User
+            </th>
+            <th class="px-4 py-2 text-left font-bold uppercase border border-gray-200">
+              User Message
+            </th>
+            <th class="px-4 py-2 text-left font-bold uppercase border border-gray-200">
+              Bot Response
+            </th>
+            <th class="px-4 py-2 text-center font-bold uppercase border border-gray-200">
+              Time
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr
+            v-for="(item, index) in tableData"
+            :key="index"
+            class="border border-gray-200 hover:bg-gray-100"
+          >
+            <td
+              v-for="value in Object.values(item)"
+              :key="value"
+              class="px-4 py-2 border border-gray-200 text-gray-600"
             >
-              <td
-                v-for="value in Object.values(item)"
-                :key="value"
-                class="px-4 py-2 border border-gray-200 text-gray-600"
-              >
-                {{ value }}
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
+              {{ value }}
+            </td>
+          </tr>
+        </tbody>
+      </table>
     </div>
   </div>
-</div>
 </template>
-
-
 
 <script>
 import Chart from 'chart.js/auto'

@@ -11,10 +11,19 @@ dotenv.config();
 const app  = express();
 const port = process.env.PORT || 5000;
 
+app.get('/health', (req, res) => {
+  res.json({ status: 'ok' });
+});
+
+app.get('/', (req, res) => {
+  res.send('Backend is running');
+});
+
 // Allow your frontend to talk to this API
 app.use(cors({
   origin:      'http://localhost:5173',
-  credentials: true
+  credentials: true,
+  allowedHeaders: ['Authorization', 'Content-Type']
 }));
 
 // parse JSON bodies
