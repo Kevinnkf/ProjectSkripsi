@@ -1,0 +1,58 @@
+# version: '3.9'
+
+services:
+  db:
+    image: postgres:15-alpine
+    restart: unless-stopped
+    env_file:
+      - ./Server/.env
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: donadoni
+      POSTGRES_DB: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - db_data:/var/lib/postgresql/data
+
+  model:
+    build:
+      context: ./Model
+      dockerfile: Dockerfile
+    env_file:
+      - ./Model/.env
+    ports:
+      - "8000:8000"
+    depends_on:
+      - db
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 10s
+      timeout: 3s
+      retries: 3
+
+  backend:
+    build:
+      context: ./Server
+      dockerfile: Dockerfile
+    env_file:
+      - ./Server/.env
+    environment:
+      DB_HOST: db
+    ports:
+      - "5000:5000"
+    depends_on:
+      - db
+      - model
+
+  frontend:
+    build:
+      context: ./FrontEnd/feskripsi
+      dockerfile: Dockerfile
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+
+volumes:
+  db_data:
