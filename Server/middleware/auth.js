@@ -4,7 +4,9 @@ import db from "../models/index.js"; // Make sure your models/index.js uses `exp
 const User = db.admins;
 
 export const isAuthenticated = async (req, res, next) => {
-  const token = req.cookies?.SessionID;
+  const authHeader = req.headers['authorization'];
+  const token = authHeader && authHeader.split(' ')[1]; 
+  console.log("Token from header:", token);
 
   if (!token) {
     return res.status(401).json({

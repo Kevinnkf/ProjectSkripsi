@@ -87,17 +87,27 @@ export async function sendMessageToBot(req, res) {
       chat_id: saved.chat_id
     });
   } catch (err) {
-    console.error('❌ sendMessageToBot error:', err);
+    console.error('sendMessageToBot error:', err);
     return res.status(500).json({ error: 'Failed to get bot response' });
   }
 }
 
-export async function getMessageHistory(req, res) {
+export async function getAllChatHistory(req, res) {
+  try {
+    const chats = await Chat.findAll()
+    return res.json({ chats });
+  } catch (err) {
+    console.error(' getMessageHistory error:', err);
+    return res.status(500).json({ error: 'Failed fetching chats' });
+  }
+}
+
+export async function getMessageHistoryByIp(req, res) {
   try {
     const chats = await _getChatHistory(getClientIp(req));
     return res.json({ chats });
   } catch (err) {
-    console.error('❌ getMessageHistory error:', err);
+    console.error(' getMessageHistory error:', err);
     return res.status(500).json({ error: 'Failed fetching chats' });
   }
 }

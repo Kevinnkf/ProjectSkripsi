@@ -152,6 +152,7 @@
           <!-- Settings Item -->
           <li>
             <button
+              @click="goToResetPassword"
               class="group relative flex items-center w-full p-3 font-medium text-left rounded-lg transition-all duration-200 text-gray-300 hover:bg-gray-800 hover:text-white"
             >
               <div class="absolute left-0 w-1 h-6 bg-cyan-500 rounded-r-lg opacity-0 group-hover:opacity-100 transition-all duration-300"></div>
@@ -204,7 +205,6 @@
           <p class="text-xs text-gray-400">{{ userStore.user?.email || 'Guest' }} Guest</p> -->
           <p class="text-sm font-medium text-white"> {{ userStore.nippm || 'Could not fetch NIPPM' }} </p>
           <p class="text-xs text-gray-400">{{ userStore.role || 'Could not fetch role' }} </p>
-          {{ console.log (userStore) }}
         </div>
       </div>
     </div>
@@ -253,6 +253,9 @@ export default {
     },
     goToChatbot() {
       this.$router.push('/chatbot')
+    },
+    goToResetPassword() {
+      this.$router.push('/settings')
     },
     logout() {  
       Swal.fire({

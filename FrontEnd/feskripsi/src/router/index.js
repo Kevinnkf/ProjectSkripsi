@@ -5,6 +5,7 @@ import Login from '@/components/Auth/Login.vue'
 import ChatHistory from '@/components/ChatHistory/IndexHistory.vue'
 import Admins from '@/components/Admins/IndexAdmin.vue'
 import Chatbot from '@/components/Chatbot.vue'
+import Settings from '@/components/Auth/Settings.vue'
 import DefaultLayout from '@/Layout/DefaultLayout.vue'
 import BlankLayout from '@/Layout/BlankLayout.vue'
 import LandingPage from '@/components/Client/LandingPage.vue'
@@ -15,8 +16,10 @@ const routes = [
   { path: '/base-knowledge', component: Index, meta: { layout: 'default', requiresAuth: true } },
   { path: '/chat-history', component: ChatHistory, meta: { layout: 'default', requiresAuth: true } },
   { path: '/admins', component: Admins, meta: { layout: 'default', requiresAuth: true } },
+  { path: '/settings', component: Settings, meta: { layout: 'default', requiresAuth: true } },
   { path: '/chatbot', component: Chatbot, meta: { layout: 'blank' } },
   { path: '/hero', component: LandingPage, meta: { layout: 'blank' } },
+
   { path: '/:pathMatch(.*)*', component: Dashboard }, // Catch-all (optional)
 ]
 

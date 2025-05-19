@@ -5,6 +5,7 @@ import chatsRoutes     from './chats.js';
 import feedbackRoutes  from './feedback.js';
 import knowledgeRoutes from './baseKnowledge.js';
 import adminsRoutes    from './admins.js';
+import faqRoutes    from './faq.js';
 import { isAuthenticated } from '../middleware/auth.js';
 
 const router = express.Router();
@@ -13,6 +14,7 @@ const router = express.Router();
 router.use('/api/auth', authRoutes);
 router.use('/api/chats', chatsRoutes);
 router.use('/api/feedback', feedbackRoutes);
+router.use('/api/faq', faqRoutes);
 
 // protected
 router.use('/api/knowledge', isAuthenticated, knowledgeRoutes);

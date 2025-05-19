@@ -3,7 +3,8 @@ import { sendMessageToBot, getMessageHistory, getChatsWithFeedback } from '../co
 
 const router = express.Router();
 
-router.get('/',  getMessageHistory);
+router.get('/',  getMessageHistoryByIp);
+router.get('/get',  getAllChatHistory);
 router.post('/post', sendMessageToBot);
 
 router.get('/with-feedback', getChatsWithFeedback);

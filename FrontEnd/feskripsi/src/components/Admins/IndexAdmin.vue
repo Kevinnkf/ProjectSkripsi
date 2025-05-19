@@ -136,10 +136,11 @@
 <script>
 import axios from "axios";
 import Swal from "sweetalert2"
+import api from '../../services/axios.js'; 
 
 export default {
   data() {
-    return {
+    return {  
       tableData: [], // Stores API data
       isModalOpen: false, // Controls modal visibility
       newAdmin: {
@@ -187,13 +188,14 @@ export default {
     },
     async fetchData() {
       try {
-        const response = await axios.get("http://localhost:5000/api/admins");
+        const response = await api.get("/admins");
+
         this.tableData = response.data;
         console.log("Fetched Data:", this.tableData);
       } catch (error) {
         console.error("Error fetching data:", error);
       }
-    },
+    }
   },
   mounted() {
     this.fetchData(); // Fetch data when component is mounted

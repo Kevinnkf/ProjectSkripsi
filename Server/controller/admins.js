@@ -1,5 +1,5 @@
 import jwt from 'jsonwebtoken';
-import bcrypt from 'bcrypt';
+import bcrypt, { hash } from 'bcrypt';
 import pool from '../config/db.js'; // Assuming this is ESM
 import db from '../models/index.js';
 import { Op } from 'sequelize';
@@ -131,9 +131,29 @@ export async function registerAdmins(req, res) {
 
 export async function resetPassword(req, res) {
   try {
-    const { id, nippm, password, role } = req.body;
-    
-    
+    const { nippm, oldpassword, newpassword } = req.body;
+
+    if(!nippm || !oldpassword || !newpassword){
+      return res.status(400).json({error: 'please enter the old password and the new password'})
+    }
+
+    const user = await Admin.findOne({
+      where: {nippm}
+    })
+    if (!user){
+      return res.status(400).json({error: 'User does not exist, please check again'})
+    }
+
+    const isMatch = await bcrypt.compare(oldpassword, user.password)
+    if(!isMatch){
+      return res.status(401).json({error: 'Incorrect password! Please check again'})
+    }
+
+    const hashedNewPassword = await bcrypt.hash(newpassword, 10);
+    user.password = hashedNewPassword;
+    await user.save();
+
+    return res.status(200).json({ message: 'Password successfully updated' });
   } catch (error) {
     console.error('Error resetting password', error);
     res.status(500).json({ error: 'Failed to reset password' });

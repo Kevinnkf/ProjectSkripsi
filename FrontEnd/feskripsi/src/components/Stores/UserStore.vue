@@ -1,25 +1,31 @@
 <script>
+// stores/user.js
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
-import { jwtDecode  } from 'jwt-decode'
+import { jwtDecode } from 'jwt-decode'
 
 export const useUserStore = defineStore('user', () => {
-  // State
+  const token = ref(null)
   const nippm = ref(null)
   const role = ref(null)
-  
-  // Actions
+
   const setUser = (userData) => {
     nippm.value = userData.nippm
     role.value = userData.role
   }
-  
+
+  const setToken = (newToken) => {
+    token.value = newToken
+    localStorage.setItem('token', newToken)
+    restoreUserFromToken() // Refresh user info
+  }
+
   const restoreUserFromToken = () => {
-    const token = localStorage.getItem('token')
-    if (token) {
+    const savedToken = localStorage.getItem('token')
+    if (savedToken) {
       try {
-        const decoded = jwtDecode(token)
-        console.log("token: ", decoded)
+        const decoded = jwtDecode(savedToken)
+        token.value = savedToken
         setUser({
           nippm: decoded.nippm,
           role: decoded.role
@@ -30,16 +36,18 @@ export const useUserStore = defineStore('user', () => {
       }
     }
   }
-  
-  // Initialize the store when created
+
   restoreUserFromToken()
 
-  return { 
+  return {
+    token,
     nippm,
     role,
     setUser,
+    setToken,
     restoreUserFromToken
   }
 })
+
 
 </script>
