@@ -83,94 +83,91 @@ export default {
 </script>
 
 <template>
-  <div>
-    <div
-      class="relative flex flex-col w-full min-w-0 mb-0 break-words bg-white border-0 border-transparent border-solid shadow-soft-xl rounded-2xl bg-clip-border"
-    >
+  <div class="p-6 bg-white rounded-2xl shadow-soft-xl">
+    <!-- Intro Section -->
     <div class="p-6">
       <h1 class="text-2xl font-bold">Base Knowledge Page</h1>
       <p>Welcome to the Base Knowledge page!</p>
     </div>
-      <div class="flex-col justify-between">
-        <div class="p-6 pb-0 mb-2 bg-white rounded-t-2xl"></div>
-      </div>
-      <div class="flex-auto px-0 pt-0 pb-2 space-x-5">
-        <div class="p-4 overflow-x-auto">
-          <div class="flex justify-between">
-            <div class="p-6">
-              <h1 class="text-2xl font-bold">List of SOP</h1>
-              <p>See the chatbot knowlege about Standard Operational Procedure</p>
-            </div>
-            <div class="p-6">
-              <button
-                @click="openModal"
-                class="px-4 py-2 bg-green-800 hover:bg-green-600 text-white rounded-lg transition"
-              >
-                Add knowledge
-              </button>
-            </div>
-          </div>
 
-          <!-- Data Table -->
-          <table
-            id="data-table"
-            class="table-fixed w-full border-collapse border border-gray-200 text-slate-500"
+    <!-- List Header & Action -->
+    <div class="flex items-center justify-between mb-4 px-6">
+      <h2 class="text-xl font-semibold">List of SOP</h2>
+      <button
+        @click="openModal"
+        class="px-4 py-2 bg-green-800 hover:bg-green-600 text-white rounded-lg transition"
+      >
+        Add Knowledge
+      </button>
+    </div>
+
+    <!-- Data Table -->
+    <div class="overflow-x-auto px-6 pb-6">
+      <table
+        id="data-table"
+        class="table-fixed w-full border-collapse border border-gray-200 text-slate-500"
+      >
+        <thead class="bg-gray-100">
+          <tr>
+            <th class="px-4 py-2 text-left font-bold uppercase border border-gray-200">
+              ID
+            </th>
+            <th class="px-4 py-2 text-left font-bold uppercase border border-gray-200">
+              Filename
+            </th>
+            <th class="px-4 py-2 text-left font-bold uppercase border border-gray-200">
+              Notes
+            </th>
+            <th class="px-4 py-2 text-center font-bold uppercase border border-gray-200">
+              Time
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr
+            v-for="(item, index) in tableData"
+            :key="index"
+            class="border border-gray-200 hover:bg-gray-100"
           >
-            <thead class="bg-gray-100">
-              <tr>
-                <th class="px-4 py-2 text-left font-bold uppercase border border-gray-200">
-                  ID
-                </th>
-                <th class="px-4 py-2 text-left font-bold uppercase border border-gray-200">
-                  Filename
-                </th>
-                <th class="px-4 py-2 text-left font-bold uppercase border border-gray-200">
-                  Notes
-                </th>
-                <th class="px-4 py-2 text-center font-bold uppercase border border-gray-200">
-                  Time
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr
-                v-for="(item, index) in tableData"
-                :key="index"
-                class="border border-gray-200 hover:bg-gray-100"
-              >
-                <td class="px-4 py-2 border border-gray-200 text-gray-600">
-                  {{ item.bk_id }}test
-                </td>
-                <td class="px-4 py-2 border border-gray-200 text-gray-600">
-                  {{ item.filename }}
-                </td>
-                <td class="px-4 py-2 border border-gray-200 text-gray-600">
-                  {{ item.notes }}
-                </td>
-                <td class="px-4 py-2 border border-gray-200 text-gray-600">
-                  {{ item.created_at }}
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
+            <td class="px-4 py-2 border border-gray-200 text-gray-600">
+              {{ item.bk_id }}
+            </td>
+            <td class="px-4 py-2 border border-gray-200 text-gray-600">
+              {{ item.filename }}
+            </td>
+            <td class="px-4 py-2 border border-gray-200 text-gray-600">
+              {{ item.notes }}
+            </td>
+            <td class="px-4 py-2 border border-gray-200 text-gray-600">
+              {{ item.created_at }}
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
 
-        <!-- Modal -->
-        <transition name="modal-fade">
-        <div
-          v-show="isModalOpen"
-          class="fixed inset-0 bg-gray-600 bg-opacity-50 flex justify-center items-center"
-        >
-          <div class="bg-white p-6 rounded-md w-96 overflow-y-auto max-h-[90vh]">
-            <h2 class="text-xl font-bold mb-4">Add new knowledge</h2>
-            <form @submit.prevent="addKnowledge">
-              <!-- File Input -->
-              <div class="mb-4">
-                <label for="files" class="block text-sm font-semibold">Files</label>
-                <input class="w-full p-2.5 border rounded" type="file" id="file" ref="file" @change="onChangeFileUpload" />
-              </div>
+    <!-- Modal -->
+    <transition name="modal-fade">
+      <div
+        v-show="isModalOpen"
+        class="fixed inset-0 bg-gray-600 bg-opacity-50 flex justify-center items-center"
+      >
+        <div class="bg-white p-6 rounded-md w-96 overflow-y-auto max-h-[90vh]">
+          <h2 class="text-xl font-bold mb-4">Add new knowledge</h2>
+          <form @submit.prevent="addKnowledge">
+            <!-- File Input -->
+            <div class="mb-4">
+              <label for="files" class="block text-sm font-semibold">Files</label>
+              <input
+                class="w-full p-2.5 border rounded"
+                type="file"
+                id="file"
+                ref="file"
+                @change="onChangeFileUpload"
+              />
+            </div>
 
-              <!-- Notes Input -->
+            <!-- Notes Input -->
               <!-- <div class="mb-4">
                 <label for="notes" class="block text-sm font-semibold">Notes</label>
                 <textarea
@@ -180,32 +177,34 @@ export default {
                 ></textarea>
               </div> -->
 
-              <!-- Hidden Date Field -->
-              <div class="mb-4 hidden">
-                <label for="created_at" class="block text-sm font-semibold">Time</label>
-                <input
-                  type="datetime-local"
-                  id="created_at"
-                  v-model="newKnowledge.created_at"
-                  class="w-full p-2.5 border rounded"
-                />
-              </div>
+            <!-- Hidden Date Field -->
+            <div class="mb-4 hidden">
+              <label for="created_at" class="block text-sm font-semibold">Time</label>
+              <input
+                type="datetime-local"
+                id="created_at"
+                v-model="newKnowledge.created_at"
+                class="w-full p-2.5 border rounded"
+              />
+            </div>
 
-              <!-- Buttons -->
-              <div class="flex justify-end">
-                <button type="button" @click="closeModal" class="bg-gray-200 text-black px-4 py-2 rounded mr-2">
-                  Back
-                </button>
-                <button type="submit" class="bg-green-800 text-white px-4 py-2 rounded">
-                  Save
-                </button>
-              </div>
-            </form>
-          </div>
+            <!-- Buttons -->
+            <div class="flex justify-end">
+              <button
+                type="button"
+                @click="closeModal"
+                class="bg-gray-200 text-black px-4 py-2 rounded mr-2"
+              >
+                Back
+              </button>
+              <button type="submit" class="bg-green-800 text-white px-4 py-2 rounded">
+                Save
+              </button>
+            </div>
+          </form>
         </div>
-      </transition>
       </div>
-    </div>
+    </transition>
   </div>
 </template>
 

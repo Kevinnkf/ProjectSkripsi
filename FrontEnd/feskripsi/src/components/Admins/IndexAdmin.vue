@@ -1,52 +1,46 @@
 <template>
-<div class="relative flex flex-col w-full min-w-0 mb-0 break-words bg-white border-0 shadow-soft-xl rounded-2xl bg-clip-border">
-  <div class="p-6">
-    <h1 class="text-2xl font-bold">Admins Page</h1>
-    <p>Welcome to the Admins section!</p>
-  </div>
+  <div class="p-6 bg-white rounded-2xl shadow-soft-xl">
+    <!-- Intro Section -->
+    <div class="p-6">
+      <h1 class="text-2xl font-bold">Admins Page</h1>
+      <p>Welcome to the Admins section!</p>
+    </div>
 
-    <div class="p-6 pb-0 mb-2 bg-white rounded-t-2xl"></div>
+    <!-- Header & Action -->
+    <div class="flex items-center justify-between mb-4 px-6">
+      <h2 class="text-xl font-semibold">List of Active Admins</h2>
+      <button
+        @click="openModal"
+        class="px-4 py-2 bg-green-800 hover:bg-green-600 text-white rounded-lg transition"
+      >
+        Register Admin
+      </button>
+    </div>
 
-    <div class="flex-auto px-0 pt-0 pb-2 space-x-5">
-      <div class="p-4 overflow-x-auto">
-        <div class="flex justify-between items-center">
-          <div class="p-6">
-            <h2 class="text-2xl font-bold">List of Active Admins</h2>
-            <p>See the active admins</p>
-          </div>
-          <div class="p-6">
-            <button
-              @click="openModal"
-              class="px-4 py-2 bg-green-800 hover:bg-green-600 text-white rounded-lg transition"
-            >
-              Register Admin
-            </button>
-          </div>
-        </div>
-
-        <!-- Admin Table -->
-        <table
-          id="data-table"
-          class="table-fixed w-full border-collapse border border-gray-200 text-slate-500"
-        >
-          <thead class="bg-gray-100">
-            <tr>
-              <th class="px-4 py-2 text-center font-bold uppercase border">NIPPM</th>
-              <th class="px-4 py-2 text-center font-bold uppercase border">Role</th>
-              <th class="px-4 py-2 text-center font-bold uppercase border">Time</th>
-              <!-- <th class="px-4 py-2 text-center font-bold uppercase border">Action</th> -->
-            </tr>
-          </thead>
-          <tbody>
-            <tr
-              v-for="(item, index) in tableData"
-              :key="index"
-              class="border border-gray-200 hover:bg-gray-100"
-            >
-              <td class="px-4 py-2 text-center border text-gray-600">{{ item.nippm }}</td>
-              <td class="px-4 py-2 text-center border text-gray-600">{{ item.role }}</td>
-              <td class="px-4 py-2 text-center border text-gray-600">{{ item.created_at }}</td>
-              <!-- <td class="px-4 py-2 text-center border text-gray-600">
+    <!-- Data Table -->
+    <div class="overflow-x-auto px-6 pb-6">
+      <table
+        id="data-table"
+        class="table-fixed w-full border-collapse border border-gray-200 text-slate-500"
+      >
+        <thead class="bg-gray-100">
+          <tr>
+            <th class="px-4 py-2 text-center font-bold uppercase border">NIPPM</th>
+            <th class="px-4 py-2 text-center font-bold uppercase border">Role</th>
+            <th class="px-4 py-2 text-center font-bold uppercase border">Time</th>
+            <!-- <th class="px-4 py-2 text-center font-bold uppercase border">Action</th> -->
+          </tr>
+        </thead>
+        <tbody>
+          <tr
+            v-for="(item, index) in tableData"
+            :key="index"
+            class="border border-gray-200 hover:bg-gray-100"
+          >
+            <td class="px-4 py-2 text-center border text-gray-600">{{ item.nippm }}</td>
+            <td class="px-4 py-2 text-center border text-gray-600">{{ item.role }}</td>
+            <td class="px-4 py-2 text-center border text-gray-600">{{ item.created_at }}</td>
+            <!-- <td class="px-4 py-2 text-center border text-gray-600">
                 <div class="flex justify-center gap-2">
                   <button
                     @click="editAdmin(item)"
@@ -62,17 +56,17 @@
                   </button>
                 </div>
               </td> -->
-            </tr>
-          </tbody>
-        </table>
-      </div>
+          </tr>
+        </tbody>
+      </table>
+    </div>
 
-      <!-- Modal -->
-      <transition name="modal-fade">
-        <div
+    <!-- Modal -->
+    <transition name="modal-fade">
+      <div
         v-show="isModalOpen"
         class="fixed inset-0 bg-gray-600 bg-opacity-50 flex justify-center items-center z-50"
-        >
+      >
         <div class="bg-white p-6 rounded-md w-96 overflow-y-auto max-h-[90vh]">
           <h2 class="text-xl font-bold mb-4">Register New Admin</h2>
 
@@ -122,25 +116,22 @@
                 type="button"
                 @click="closeModal"
                 class="bg-gray-200 text-black px-4 py-2 rounded mr-2"
-                >
+              >
                 Back
               </button>
               <button
-              type="submit"
-              class="bg-green-800 text-white px-4 py-2 rounded"
+                type="submit"
+                class="bg-green-800 text-white px-4 py-2 rounded"
               >
-              Save
+                Save
               </button>
             </div>
           </form>
         </div>
       </div>
-     </transition>
-    </div>
+    </transition>
   </div>
 </template>
-
-
 
 <script>
 import axios from "axios";
