@@ -21,7 +21,7 @@ app.add_middleware(
 )
 
 # Qdrant setup
-collection_name = "rag-infloat-collection"
+collection_name = "rag-infloatLarge-collection"
 
 client = QdrantClient(
     url="https://48b49ac1-8387-42bb-b0d7-10587d2aa625.eu-west-1-0.aws.cloud.qdrant.io",
@@ -32,10 +32,10 @@ client = QdrantClient(
 if not client.collection_exists(collection_name):
     client.recreate_collection(
         collection_name=collection_name,
-        vectors_config=VectorParams(size=384, distance=Distance.COSINE),
+        vectors_config=VectorParams(size=1024, distance=Distance.COSINE),
     )
 
-embed_model = SentenceTransformer('intfloat/multilingual-e5-small')
+embed_model = SentenceTransformer('intfloat/multilingual-e5-large')
 
 # Extract from excel
 def extract_text_from_excel():
