@@ -1,107 +1,93 @@
 <template>
-  <div class="p-6 bg-white rounded-2xl shadow-soft-xl">
-    <!-- Intro Section -->
-    <div class="p-6">
-      <h1 class="text-2xl font-bold">Dashboard Page</h1>
-      <p>Welcome to the Dashboard section!</p>
+  <div class="p-8 min-h-screen bg-gradient-to-br from-green-50 to-white rounded-2xl">
+    <!-- Header Section -->
+    <div class="mb-4">
+      <h1 class="text-3xl font-bold text-[#064E3B] drop-shadow">Dashboard</h1>
+      <p class="text-gray-700">Welcome to the Dashboard section!</p>
     </div>
 
-  <div class="relative flex flex-col w-full min-w-0 mb-0 break-words bg-white border-0 border-transparent border-solid shadow-soft-xl rounded-2xl bg-clip-border">
-    <div class="flex-row justify-between">
-      <div class="flex flex-wrap justify-between gap-4 p-6 bg-white">
-        <div
-          class="flex-1 max-w-sm p-6 bg-white border border-gray-200 rounded-lg shadow hover:bg-gray-100"
-        >
-          <h5 class="mb-2 text-2xl font-bold tracking-tight text-gray-900">Questions Asked</h5>
-          <p class="font-normal text-xl text-gray-700">{{}} 28</p>
-        </div>
-        <div
-          class="flex-1 max-w-sm p-6 bg-white border border-gray-200 rounded-lg shadow hover:bg-gray-100"
-        >
-          <h5 class="mb-2 text-2xl font-bold tracking-tight text-gray-900">Users per Day</h5>
-          <p class="font-normal text-xl text-gray-700">{{}} 30</p>
-        </div>
-        <div
-          class="flex-1 max-w-sm p-6 bg-white border border-gray-200 rounded-lg shadow hover:bg-gray-100"
-        >
-          <h5 class="mb-2 text-2xl font-bold tracking-tight text-gray-900">Base Knowledge</h5>
-          <p class="font-normal text-xl text-gray-700">{{}} 12</p>
-        </div>
+    <!-- Stat Cards -->
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-6 mb-8">
+      <div class="flex flex-col justify-center items-start p-6 bg-white border border-gray-100 rounded-2xl shadow hover:shadow-md transition min-h-[120px]">
+        <span class="text-gray-500 text-xs mb-1">Questions Asked</span>
+        <span class="text-3xl font-extrabold text-[#064E3B] mb-2">{{ questionsThisWeek }}</span>
+        <span class="text-sm text-gray-400">This week</span>
+      </div>
+      <div class="flex flex-col justify-center items-start p-6 bg-white border border-gray-100 rounded-2xl shadow hover:shadow-md transition min-h-[120px]">
+        <span class="text-gray-500 text-xs mb-1">Users per Day</span>
+        <span class="text-3xl font-extrabold text-[#064E3B] mb-2">{{ 30 }}</span>
+        <span class="text-sm text-gray-400">Average</span>
+      </div>
+      <div class="flex flex-col justify-center items-start p-6 bg-white border border-gray-100 rounded-2xl shadow hover:shadow-md transition min-h-[120px]">
+        <span class="text-gray-500 text-xs mb-1">Base Knowledge</span>
+        <span class="text-3xl font-extrabold text-[#064E3B] mb-2">{{ 12 }}</span>
+        <span class="text-sm text-gray-400">Documents</span>
       </div>
     </div>
-    <div class="flex-col justify-between">
-      <div class="p-6 pb-0 mb-2 bg-white rounded-t-2xl">
-        <h1 class="text-2xl font-bold"> Chatbot response in the last 7 days</h1>
-        <!-- Check if chatData is empty -->
-        <div v-if="chatData.length === 0" class="text-center text-gray-500 my-8">
+
+    <!-- Chart Section -->
+    <div class="bg-white rounded-2xl shadow border border-gray-100 p-6 mb-8">
+    <h2 class="text-xl font-semibold text-[#064E3B] mb-3">Chatbot Responses in the Last 7 Days</h2>
+      <div v-if="last7DaysCounts.every(cnt => cnt === 0)" class="text-center text-gray-500 my-8">
           <h3 class="text-lg font-semibold">There are no data for now.</h3>
-        </div>
-
-        <!-- <p>Chat fot </p> -->
-        <canvas id="myChart" width="400" height="100"></canvas>
+      </div>
+      <div v-else>
+        <canvas id="myChart" width="400" height="120"></canvas>
       </div>
     </div>
-    <div class="flex-auto px-0 pt-0 pb-2 space-x-5">
-      <div class="p-4 overflow-x-auto">
-        <div class="flex justify-between items-center">
-          <div class="p-6">
-            <h2 class="text-2xl font-bold">Frequently Asked Questions</h2>
-            <p>See what's user has been up to here</p>
-          </div>
-          <div class="p-6">
-            <button @click="openModal" class="px-4 py-2 bg-green-800 hover:bg-green-600 text-white rounded-lg transition">
-              Add new FAQ
-            </button>
-          </div>
-        </div>
 
-        <!-- If no data -->
-        <div v-if="faqData.length === 0" class="text-center text-gray-500 my-8">
-          <h3 class="text-lg font-semibold">There are no data for now.</h3>
+    <!-- FAQ Section -->
+    <div class="bg-white rounded-2xl shadow border border-gray-100 p-6">
+      <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4">
+        <div>
+          <h2 class="text-2xl font-bold text-[#064E3B]">Frequently Asked Questions</h2>
+          <p class="text-gray-500">See what users have been up to here</p>
         </div>
-
-        <div v-else v-for="(item, index) in faqData" :key="index" class="space-y-6 text-left md:px-12 my-4">
-          <div class="bg-white p-6 rounded-lg shadow">
-            <h3 class="text-xl font-semibold">{{ item.question }}</h3>
-            <p class="text-gray-700 mt-2">
-              {{ item.answer }}
-            </p>
-          </div>
+        <button @click="openModal"
+          class="inline-flex items-center px-4 py-2 bg-green-800 hover:bg-green-600 text-white rounded-lg shadow transition font-semibold mt-4 sm:mt-0">
+          + Add new FAQ
+        </button>
+      </div>
+      <!-- If no data -->
+      <div v-if="faqData.length === 0" class="text-center text-gray-500 my-8">
+        <h3 class="text-lg font-semibold">There are no data for now.</h3>
+      </div>
+      <div v-else class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div v-for="(item, index) in faqData" :key="index" class="bg-blue-50 border border-blue-100 rounded-xl p-6 shadow-sm">
+          <h3 class="text-lg font-semibold text-[#064E3B]">{{ item.question }}</h3>
+          <p class="text-gray-700 mt-2">{{ item.answer }}</p>
         </div>
       </div>
     </div>
-  </div>
-      <!-- Modal -->
-      <transition name="modal-fade">
-        <div
+
+    <!-- Modal -->
+    <transition name="modal-fade">
+      <div
         v-show="isModalOpen"
         class="fixed inset-0 bg-gray-600 bg-opacity-50 flex justify-center items-center z-50"
-        >
-        <div class="bg-white p-6 rounded-md w-1/2 overflow-y-auto max-h-[90vh]">
-          <h2 class="text-xl font-bold mb-4">Register New Admin</h2>
-
+      >
+        <div class="bg-white p-8 rounded-2xl w-full max-w-lg shadow-lg overflow-y-auto max-h-[90vh]">
+          <h2 class="text-xl font-bold mb-4 text-[#064E3B]">Add New FAQ</h2>
           <form @submit.prevent="addFaq">
             <div class="mb-4">
-              <label for="question" class="block text-sm font-semibold">question</label>
+              <label for="question" class="block text-sm font-semibold">Question</label>
               <input
                 id="question"
                 v-model="newFaq.question"
                 type="text"
                 placeholder="Example: Apa itu HaloPNJ"
-                class="w-full p-2.5 border rounded resize"
+                class="w-full p-3 border border-gray-200 rounded focus:ring-2 focus:ring-green-300"
               />
             </div>
-
             <div class="mb-4">
-              <label for="answer" class="block text-sm font-semibold">answer</label>
+              <label for="answer" class="block text-sm font-semibold">Answer</label>
               <textarea
                 id="answer"
                 v-model="newFaq.answer"
                 placeholder="HaloPNJ adalah aplikasi berbasis AI untuk keperluan layanan akademik dan kemahasiswaan"
-                class="w-full p-2.5 border rounded h-32 resize"
+                class="w-full p-3 border border-gray-200 rounded h-32 focus:ring-2 focus:ring-green-300"
               ></textarea>
             </div>
-
             <div class="flex justify-end">
               <button
                 type="button"
@@ -120,8 +106,8 @@
           </form>
         </div>
       </div>
-     </transition>
-</div>
+    </transition>
+  </div>
 </template>
 
 <script>
@@ -132,6 +118,7 @@ import api from "../services/axios.js";
 export default {
   data() {
     return {
+      questionsThisWeek: 0,
       chatData: [],
       faqData: [],
       chart: null,
@@ -140,62 +127,79 @@ export default {
         question: "",
         answer: "",
       },
+      last7DaysLabels: [],
+      last7DaysCounts: [],
     }
   },
   mounted() {
-    this.renderChart()
-    this.fetchChatData()
-    this.fetchFaqData()
+    this.fetchQuestionsThisWeek();
+    this.fetchChatData();
+    this.fetchFaqData();
   },
   methods: {
-    openModal() {
-      this.isModalOpen = true;
+    async fetchQuestionsThisWeek() {
+      try {
+        const res = await fetch('http://localhost:5000/api/chats/count-this-week');
+        const data = await res.json();
+        this.questionsThisWeek = data.count || 0;
+      } catch (err) {
+        console.error("Failed to fetch questions count this week:", err);
+      }
     },
-    closeModal() {
-      this.isModalOpen = false;
-    },
-    getLast7DaysLabels() {
-      const days = []
-      const today = new Date()
-      const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
-
+    getLast7DaysLabelsAndDates() {
+      // Returns { labels: ['Sun',...], days: ['2024-07-04', ...] }
+      const labels = [];
+      const days = [];
+      const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
       for (let i = 6; i >= 0; i--) {
-        const d = new Date(today)
-        d.setDate(d.getDate() - i)
-        const isoDate = d.toISOString().split('T')[0] // '2025-05-01'
-        days.push({
-          date: isoDate,
-          label: dayNames[d.getDay()],
-        })
+        const d = new Date();
+        d.setDate(d.getDate() - i);
+        const isoDate = d.toISOString().slice(0, 10);
+        labels.push(dayNames[d.getDay()]);
+        days.push(isoDate);
       }
-
-      return days
+      return { labels, days };
     },
-
     countMessagesPerDay(data, days) {
-      if (!Array.isArray(data)) {
-        console.warn("Expected 'data' to be an array but got:", data);
-        data = []; // fallback to empty array instead of breaking
-      }
-
-      return days.map(dayObj => {
-        const count = data.filter(chat => {
-          const createdAt = chat.createdAt || chat.created_at || '';
-          return typeof createdAt === 'string' && createdAt.startsWith(dayObj.date);
-        }).length;
-        return count;
-      });
+      return days.map(day =>
+        data.filter(chat => {
+          const created = chat.created_at || chat.createdAt || "";
+          return typeof created === "string" && created.startsWith(day);
+        }).length
+      );
     },
+    async fetchChatData() {
+      try {
+        const response = await fetch('http://localhost:5000/api/chats/get');
+        const data = await response.json();
+        const chatData = data.chats || [];
+        this.chatData = chatData;
 
+        const { labels, days } = this.getLast7DaysLabelsAndDates();
+        this.last7DaysLabels = labels;
+        this.last7DaysCounts = this.countMessagesPerDay(chatData, days);
+
+        // Only render if there is at least one value > 0
+        if (this.last7DaysCounts.some(cnt => cnt > 0)) {
+          this.$nextTick(() => this.renderChart());
+        }
+      } catch (error) {
+        console.error('Error fetching chat data:', error);
+      }
+    },
     renderChart() {
-      const ctx = document.getElementById('myChart').getContext('2d')
+      const ctx = document.getElementById('myChart');
+      if (!ctx) return;
+      if (this.chart) {
+        this.chart.destroy();
+      }
       this.chart = new Chart(ctx, {
         type: 'line',
         data: {
-          labels: [],
+          labels: this.last7DaysLabels,
           datasets: [{
             label: 'Chatbot Responses (Last 7 Days)',
-            data: [],
+            data: this.last7DaysCounts,
             borderColor: '#60a5fa',
             backgroundColor: '#60a5fa33',
             tension: 0.4,
@@ -204,60 +208,40 @@ export default {
         },
         options: {
           responsive: true,
+          plugins: {
+            legend: { display: false }
+          },
           scales: {
-            y: {
-              beginAtZero: true,
-              ticks: {
-                precision: 0, 
-              },
-            },
+            y: { beginAtZero: true, ticks: { precision: 0 } },
           },
         },
-      })
+      });
     },
     async fetchFaqData() {
       try {
-        const response = await api.get("/faq"); // Ensure this is the correct route
-        
+        const response = await api.get("/faq");
         this.faqData = response.data;
-
       } catch (error) {
         console.error("Error fetching FAQ data:", error);
-      }
-    },
-    async fetchChatData() {
-      try {
-        const response = await fetch('http://localhost:5000/api/chats/get')
-        const data = await response.json()
-        const chatData = data.chats
-        
-        const dayObjects = this.getLast7DaysLabels()
-        const labels = dayObjects.map(d => d.label)
-        const values = this.countMessagesPerDay(chatData, dayObjects)
-
-        this.chart.data.labels = labels
-        this.chart.data.datasets[0].data = values
-        this.chart.update()
-
-      } catch (error) {
-        console.error('Error fetching data:', error)
       }
     },
     async addFaq() {
       try {
         const response = await api.post('/faq/post', this.newFaq)
-        console.log("Success:", response.data);
         Swal.fire("Success!", "New FAQ has been added", "success");
-        // Refresh the table data
         await this.fetchFaqData();
         this.closeModal();
-
-        // Reset form
         this.newFaq = { question: "", answer: ""};
       } catch (error) {
         Swal.fire("Adding faq failed", error.message || "Something went wrong", "error");
       }
     },
+    openModal() {
+      this.isModalOpen = true;
+    },
+    closeModal() {
+      this.isModalOpen = false;
+    }
   },
 }
 </script>

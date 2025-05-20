@@ -1,3 +1,4 @@
+import { Op } from 'sequelize';
 import axios from 'axios';
 import dotenv from 'dotenv';
 import db     from '../models/index.js';
@@ -53,6 +54,30 @@ export async function getChatsWithFeedback(req, res) {
   } catch (err) {
     console.error('❌ getChatsWithFeedback error:', err);
     return res.status(500).json({ error: 'Failed to fetch chat history with feedback' });
+  }
+}
+
+export async function getQuestionsCountThisWeek(req, res) {
+  try {
+    // --- Monday as start of week ---
+    const today = new Date();
+    const firstDayOfWeek = new Date(today);
+    const day = today.getDay() === 0 ? 6 : today.getDay() - 1;
+    firstDayOfWeek.setDate(today.getDate() - day);
+    firstDayOfWeek.setHours(0, 0, 0, 0);
+
+    const count = await Chat.count({
+      where: {
+        created_at: {
+          [Op.gte]: firstDayOfWeek
+        }
+      }
+    });
+
+    res.json({ count });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Failed to count questions for this week' });
   }
 }
 
