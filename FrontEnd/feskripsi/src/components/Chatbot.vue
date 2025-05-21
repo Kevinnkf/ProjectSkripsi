@@ -84,10 +84,10 @@ const hasFeedback = (chat, type) => {
 </script>
 
 <template>
+<Navbar/>
   <div class="d-flex flex-column">
     <!-- Chat Section -->
     <div class="flex flex-col w-full max-w-screen-2xl mx-auto h-screen p-4 bg-white-100 rounded-lg shadow-lg">
-      <Navbar/>
       <!-- Chat History -->
       <div class="px-60 w-100 flex-1 overflow-y-auto p-3 rounded bg-white space-y-6"> <!-- Increased space-y -->
         <div v-for="(chat, index) in chatHistory" :key="index">
