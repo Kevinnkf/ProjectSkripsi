@@ -5,10 +5,9 @@ from app.routes import router as api_router
 
 app = FastAPI(title="RAG Retrieval API")
 
-# @app.on_event("startup")
-# def load_all_models():
-#     # this blocks until init_models completes
-#     init_models()
+@app.get("/")
+async def root():
+    return {"message": "RAG service is alive"}
 
 @app.get("/health")
 async def health():

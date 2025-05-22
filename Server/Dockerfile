@@ -1,28 +1,17 @@
-FROM node:20-alpine
-
-# install bash and ca-certs (for HTTPS)
-RUN apk add --no-cache bash ca-certificates
-
+# Server/Dockerfile
+FROM node:18-alpine
 WORKDIR /app
 
-# copy package.json and lock file, install prod deps
+# Copy package manifests and install deps
 COPY package*.json ./
-RUN npm ci --production
+RUN npm ci
 
-# copy the wait-for-it script
-# COPY wait-for-it.sh /usr/local/bin/
-# RUN chmod +x /usr/local/bin/wait-for-it.sh
-
-# copy source
+# Copy source
 COPY . .
 
-# expose be port
-ENV PORT=5000
+# Expose and run
 EXPOSE 5000
-
-# wait for the DB container to accept connections, then start
 CMD ["node", "index.js"]
-# CMD [ "sh", "-c", "/usr/local/bin/wait-for-it.sh db:5432 -- node index.js" ]
 
 # FROM node:20-alpine
 
