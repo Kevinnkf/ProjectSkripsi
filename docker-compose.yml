@@ -1,0 +1,63 @@
+version: '3.8'
+
+services:
+  be:
+    build:
+      context: ./Server
+      dockerfile: Dockerfile
+    environment:
+      DATABASE_URL: "postgresql://postgres:kaCxvRdfyuNYEDBumJGVfLFcNTEzZJKl@metro.proxy.rlwy.net:31665/railway"
+      FRONTEND_URL: http://localhost:5173
+    ports:
+      - "5000:5000"
+
+  rag:
+    build:
+      context: ./Model
+      dockerfile: Dockerfile
+    environment:
+      - HF_HUB_ENABLE_XET_STORAGE=false
+    ports:
+      - "8000:8000"
+
+# version: '3.8'
+# services:
+#   db:
+#     image: postgres:15
+#     environment:
+#       POSTGRES_USER: postgres
+#       POSTGRES_PASSWORD: donadoni
+#       POSTGRES_DB: postgres
+#     ports:
+#       - "5432:5432"
+#     healthcheck:
+#       test: ["CMD","pg_isready","-U","postgres"]
+#       interval: 5s
+#       retries: 5
+
+#   be:
+#     build:
+#       context: ./Server
+#       dockerfile: Dockerfile
+#     ports:
+#       - "5000:5000"
+#     environment:
+#       # DB_HOST: db
+#       # DB_USER: postgres
+#       # DB_PASSWORD: donadoni
+#       # DB_NAME: postgres
+#       # DB_PORT: 5432
+#       - DATABASE_URL=postgresql://postgres:kaCxvRdfyuNYEDBumJGVfLFcNTEzZJKl@metro.proxy.rlwy.net:31665/railway
+#       - FRONTEND_URL=http://localhost:5173
+#     depends_on:
+#       db:
+#         condition: service_healthy
+
+#   rag:
+#     build:
+#       context: ./Model
+#       dockerfile: Dockerfile
+#     environment:
+#       - HF_HUB_ENABLE_XET_STORAGE=false
+#     ports:
+#       - "8000:8000"

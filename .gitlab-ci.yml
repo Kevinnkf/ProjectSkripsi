@@ -1,0 +1,58 @@
+variables:
+  RAILWAY_TOKEN: $RAILWAY_TOKEN
+
+stages:
+  - build
+  - deploy
+
+# build & test Model
+build_model:
+  stage: build
+  image: python:3.11
+  script:
+    - cd Model
+    - python -m venv venv
+    - source venv/bin/activate
+    - pip install -r requirements.txt
+    # (optional) run tests here
+
+# build & test Backend
+build_backend:
+  stage: build
+  image: node:20
+  script:
+    - cd Server
+    - npm ci
+    # (optional) npm test
+
+# build & test Frontend
+build_frontend:
+  stage: build
+  image: node:20
+  script:
+    - cd FrontEnd/feskripsi
+    - npm ci
+    - npm run build
+
+# deploy all to Railway
+deploy_all:
+  stage: deploy
+  image: node:20
+  before_script:
+    - npm install -g railway
+    - railway login --token $RAILWAY_TOKEN
+  script:
+    # deploy Model
+    - cd Model
+    - railway up --detach
+
+    # deploy Backend
+    - cd ../Server
+    - railway up --detach
+
+    # deploy Frontend
+    - cd ../FrontEnd/feskripsi
+    - railway up --detach
+
+  only:
+    - main

@@ -18,13 +18,15 @@ const scrollToBottom = () => {
 const sendMessage = async () => {
   if (!message.value) return;
 
-  // Add user message immediately
+  // Temporarily add user's message
   chatHistory.value.push({ 
     user_message: message.value,
-    bot_response: "" 
+    bot_response: "",
+    chat_id: null,
+    feedback: null
   });
   scrollToBottom();
-  
+
   const userMessage = { message: message.value };
   message.value = "";
 
@@ -33,9 +35,15 @@ const sendMessage = async () => {
       "http://localhost:5000/api/chats/post",
       userMessage
     );
-    
-    // Update with bot's response
-    chatHistory.value[chatHistory.value.length - 1].bot_response = response.data.botReply;
+
+    // Extract the chat_id (could be response.data.chat_id or response.data.chatId)
+    const chat_id = response.data.chat_id || response.data.chatId;
+
+    // Update last message entry with chat_id and bot response
+    const lastChat = chatHistory.value[chatHistory.value.length - 1];
+    lastChat.bot_response = response.data.botReply;
+    lastChat.chat_id = chat_id;
+
     scrollToBottom();
   } catch (error) {
     console.error("Error sending message:", error);
@@ -44,52 +52,28 @@ const sendMessage = async () => {
   }
 };
 
-const fetchChatHistory = async () => {
-  try {
-    // Fetch chats and feedback in parallel
-    const [chatsResponse, feedbackResponse] = await Promise.all([
-      axios.get("http://localhost:5000/api/chats/"),
-      axios.get("http://localhost:5000/api/feedback/")
-    ]);
-
-    // Create a map of chat_id to feedback for quick lookup
-    const feedbackMap = new Map();
-    feedbackResponse.data.forEach(feedback => {
-      feedbackMap.set(feedback.chat_id, feedback.response);
-    });
-
-    const chats = chatsResponse.data.data || [];  // Adjust this to match the real structure
-    chatHistory.value = chats.map(chat => ({
-      chat_id: chat.chat_id,
-      user_message: chat.user_message,
-      bot_response: chat.bot_response,
-      feedback: feedbackMap.get(chat.chat_id) || null
-    }));
-
-    scrollToBottom();
-  } catch (error) {
-    console.error("Error fetching data:", error);
-  }
-};
-
 const sendFeedback = async (chat, type) => {
-  // Prevent duplicate feedback
   if (chat.feedback) {
     console.log("Feedback already submitted.");
     return;
   }
-
+  console.log('Feedback attempt:', { chat_id: chat.chat_id, response: type });
   try {
-    const response = await axios.post("http://localhost:5000/api/feedback/post", {
+    await axios.post("http://localhost:5000/api/feedback/post", {
       chat_id: chat.chat_id,
       response: type
     });
-    
-    // Update UI immediately
-    chat.feedback = type;  // Add this line to track feedback state
-    console.log(response.data);
+    chat.feedback = type; // Mark feedback as submitted in UI (so user can't click again)
   } catch (error) {
-    console.error("Feedback Error:", error);
+    if (
+      error.response &&
+      error.response.data &&
+      error.response.data.error === "Feedback for this chat_id already exists"
+    ) {
+      chat.feedback = type; // Prevent double feedback in UI too
+    } else {
+      console.error("Feedback Error:", error.response?.data || error);
+    }
   }
 };
 
@@ -97,15 +81,13 @@ const sendFeedback = async (chat, type) => {
 const hasFeedback = (chat, type) => {
   return chat.feedback === type;
 };
-
-onMounted(fetchChatHistory);
 </script>
 
 <template>
+<Navbar/>
   <div class="d-flex flex-column">
     <!-- Chat Section -->
     <div class="flex flex-col w-full max-w-screen-2xl mx-auto h-screen p-4 bg-white-100 rounded-lg shadow-lg">
-      <Navbar/>
       <!-- Chat History -->
       <div class="px-60 w-100 flex-1 overflow-y-auto p-3 rounded bg-white space-y-6"> <!-- Increased space-y -->
         <div v-for="(chat, index) in chatHistory" :key="index">

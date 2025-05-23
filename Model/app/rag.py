@@ -44,11 +44,11 @@ def generate_qwen_response(prompt: str) -> str:
     inputs = tokenizer(prompt, return_tensors="pt").to(device)
     output = model.generate(
         **inputs, 
-        max_new_tokens=512,
+        max_new_tokens=256,
         do_sample=False,            # <- turn off sampling entirely
         # temperature=0.1,            # <- no randomness
-        num_beams=3,                # 1 = pure greedy; >1 = beam search
-        early_stopping=True,
+        num_beams=1,                # 1 = pure greedy; >1 = beam search
+        # early_stopping=True,
         eos_token_id=tokenizer.eos_token_id,
         pad_token_id=tokenizer.eos_token_id
         )

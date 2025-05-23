@@ -1,10 +1,15 @@
 fastapi
 uvicorn[standard]
 langchain
+huggingface_hub[hf_xet]
+hf_xet
 qdrant-client
 sentence-transformers
 python-dotenv
 langchain-community
 transformers
+bitsandbytes
 accelerate
 sqlmodel
+openpyxl
+PyMuPDF

@@ -67,6 +67,31 @@
             </button>
           </li>
 
+          <!-- Chat History Item -->
+          <li>
+            <button
+              @click="goToChatHistory"
+              class="group relative flex items-center w-full p-3 font-medium text-left rounded-lg transition-all duration-200 text-gray-300 hover:bg-gray-800 hover:text-white"
+            >
+              <div class="absolute left-0 w-1 h-6 bg-cyan-500 rounded-r-lg opacity-0 group-hover:opacity-100 transition-all duration-300"></div>
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                class="w-5 h-5 mr-3 text-blue-400"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                stroke-width="2"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M7 8h10M7 12h4m-4 8h10a2 2 0 002-2V6a2 2 0 00-2-2H7l-4 4v10a2 2 0 002 2z"
+                />
+              </svg>
+              <span class="text-sm font-medium">Chat History</span>
+            </button>
+          </li>
+
           <!-- Admins Item -->
           <li>
             <button
@@ -101,7 +126,7 @@
               <svg 
                 xmlns="http://www.w3.org/2000/svg"
                 class="w-5 h-5 mr-3 text-green-400"
-                fill= "green"
+                fill="green"
                 viewBox="0 0 24 24"
                 stroke="currentColor"
                 stroke-width="2"
@@ -219,6 +244,9 @@ export default {
     },
     goToBaseKnowledge() {
       this.$router.push('/base-knowledge')
+    },
+    goToChatHistory() {
+      this.$router.push('/chat-history')
     },
     goToAdmins() {
       this.$router.push('/admins')
