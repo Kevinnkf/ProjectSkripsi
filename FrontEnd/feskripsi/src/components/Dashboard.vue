@@ -77,7 +77,7 @@
         class="fixed inset-0 bg-gray-600 bg-opacity-50 flex justify-center items-center z-50"
         >
         <div class="bg-white p-6 rounded-md w-1/2 overflow-y-auto max-h-[90vh]">
-          <h2 class="text-xl font-bold mb-4">Register New Admin</h2>
+          <h2 class="text-xl font-bold mb-4">Add new FAQ</h2>
 
           <form @submit.prevent="addFaq">
             <div class="mb-4">

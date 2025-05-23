@@ -6,7 +6,7 @@ import api from '../../services/axios.js';
 export default {
   data() {
     return {
-      chatData: [], // Initialize an empty array to store the API data
+      tableData: [], // Initialize an empty array to store the API data
       isModalOpen: false,
       newKnowledge: {
         // bk_id: "",
@@ -21,6 +21,13 @@ export default {
     this.fetchKnowledgeData();
   },
   methods: {
+    formatDate(dateString) {
+      const date = new Date(dateString);
+      const year = date.getFullYear();
+      const month = String(date.getMonth() + 1).padStart(2, '0');
+      const day = String(date.getDate()).padStart(2, '0');
+      return `${year}-${month}-${day}`;
+    },
     openModal() {
       this.isModalOpen = true;
     },
@@ -56,10 +63,7 @@ export default {
             //   headers: {
             //     "Content-Type": "multipart/form-data", 
             //   },
-            // });
-
-            
-            
+            // });  
             // console.log("Upload success:", response);
             console.log("Upload success:", sendFile);
             Swal.fire("Success!", "PDF uploaded and processed successfully.", "success");
@@ -75,9 +79,8 @@ export default {
     async fetchKnowledgeData() {
       try {
         const response = await api.get("/knowledge");
-        const data = await response.json();
-        console.log(data)
-        this.tableData = data;
+        console.log(response)
+        this.tableData = response.data;
       } catch (error) {
         console.error("Error fetching data:", error);
       }
@@ -123,9 +126,6 @@ export default {
             <thead class="bg-gray-100">
               <tr>
                 <th class="px-4 py-2 text-left font-bold uppercase border border-gray-200">
-                  ID
-                </th>
-                <th class="px-4 py-2 text-left font-bold uppercase border border-gray-200">
                   Filename
                 </th>
                 <th class="px-4 py-2 text-left font-bold uppercase border border-gray-200">
@@ -143,16 +143,13 @@ export default {
                 class="border border-gray-200 hover:bg-gray-100"
               >
                 <td class="px-4 py-2 border border-gray-200 text-gray-600">
-                  {{ item.bk_id }}test
-                </td>
-                <td class="px-4 py-2 border border-gray-200 text-gray-600">
                   {{ item.filename }}
                 </td>
                 <td class="px-4 py-2 border border-gray-200 text-gray-600">
                   {{ item.notes }}
                 </td>
                 <td class="px-4 py-2 border border-gray-200 text-gray-600">
-                  {{ item.created_at }}
+                  {{ formatDate(item.created_at) }}
                 </td>
               </tr>
             </tbody>

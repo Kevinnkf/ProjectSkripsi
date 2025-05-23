@@ -29,7 +29,7 @@ import api from "../../services/axios";
 const tableData = ref([]);
 
 onMounted(async () => {
-  try {
+  try { 
     const response = await api.get("/faq"); // Ensure this is the correct route
     tableData.value = response.data;
   } catch (error) {

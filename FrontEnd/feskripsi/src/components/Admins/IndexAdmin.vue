@@ -45,7 +45,7 @@
             >
               <td class="px-4 py-2 text-center border text-gray-600">{{ item.nippm }}</td>
               <td class="px-4 py-2 text-center border text-gray-600">{{ item.role }}</td>
-              <td class="px-4 py-2 text-center border text-gray-600">{{ item.created_at }}</td>
+              <td class="px-4 py-2 text-center border text-gray-600">{{ formatDate(item.created_at) }}</td>
               <!-- <td class="px-4 py-2 text-center border text-gray-600">
                 <div class="flex justify-center gap-2">
                   <button
@@ -161,6 +161,13 @@ export default {
     };
   },
   methods: {
+    formatDate(dateString) {
+      const date = new Date(dateString);
+      const year = date.getFullYear();
+      const month = String(date.getMonth() + 1).padStart(2, '0');
+      const day = String(date.getDate()).padStart(2, '0');
+      return `${year}-${month}-${day}`;
+    },
     openModal() {
       this.isModalOpen = true;
     },
