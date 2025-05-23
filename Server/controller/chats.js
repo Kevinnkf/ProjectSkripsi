@@ -27,6 +27,16 @@ async function _getChatHistory(ip) {
   });
 }
 
+export async function getAllChatHistory(req, res){
+  try{
+    const chats = await Chat.findAll()
+
+    return res.json(chats)
+  }catch(error){
+    return res.status(500).json({error: "error getting all chat history"})
+  }
+}
+
 export async function getChatsWithFeedback(req, res) {
   try {
     const chats = await Chat.findAll({
@@ -52,7 +62,7 @@ export async function getChatsWithFeedback(req, res) {
 
     return res.json(result);
   } catch (err) {
-    console.error('❌ getChatsWithFeedback error:', err);
+    console.error('getChatsWithFeedback error:', err);
     return res.status(500).json({ error: 'Failed to fetch chat history with feedback' });
   }
 }
@@ -112,7 +122,7 @@ export async function sendMessageToBot(req, res) {
       chat_id: saved.chat_id
     });
   } catch (err) {
-    console.error('❌ sendMessageToBot error:', err);
+    console.error('sendMessageToBot error:', err);
     return res.status(500).json({ error: 'Failed to get bot response' });
   }
 }
@@ -122,7 +132,7 @@ export async function getMessageHistory(req, res) {
     const chats = await _getChatHistory(getClientIp(req));
     return res.json({ chats });
   } catch (err) {
-    console.error('❌ getMessageHistory error:', err);
+    console.error('getMessageHistory error:', err);
     return res.status(500).json({ error: 'Failed fetching chats' });
   }
 }

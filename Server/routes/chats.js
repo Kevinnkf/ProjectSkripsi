@@ -1,8 +1,9 @@
 import express from 'express';
-import { sendMessageToBot, getMessageHistory, getChatsWithFeedback, getQuestionsCountThisWeek } from '../controller/chats.js';
+import { sendMessageToBot, getMessageHistory, getChatsWithFeedback, getQuestionsCountThisWeek, getAllChatHistory } from '../controller/chats.js';
 
 const router = express.Router();
 
+router.get('/',  getAllChatHistory);
 router.get('/get',  getMessageHistory);
 router.post('/post', sendMessageToBot);
 
