@@ -1,0 +1,28 @@
+# How to use sequelize PostgreSQL 
+
+# 1 Install sequelize
+
+npm install sequelize pg pg-hstore
+
+# 2 Init sequelize
+
+npx sequelize-cli init
+
+# 3 Create a model and run the migration
+
+npx sequelize-cli model:generate --name Chat --attributes userId:integer,message:string,reply:string
+npx sequelize-cli db:migrate
+
+# 4 create a seeder
+npx sequelize-cli db:migrate:undo:all //erase all migration
+npx sequelize-cli db:migrate
+
+npx sequelize-cli seed:generate --name demo-admin // run the seed
+npx sequelize-cli db:seed:all //run the seed
+
+
+
+
+
+
+

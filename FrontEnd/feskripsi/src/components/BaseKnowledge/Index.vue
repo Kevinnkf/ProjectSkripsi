@@ -54,7 +54,7 @@ export default {
       console.log(formData)
       
       try {
-            const sendFile = await api.post('knowledge/post', formData, {
+            const sendFile = await axios.post('http://localhost:8000/upload-bk/', formData, {
               headers: {
                 'Content-Type': 'multipart/form-data'
               }
@@ -78,9 +78,9 @@ export default {
 
     async fetchKnowledgeData() {
       try {
-        const response = await api.get("/knowledge");
-        console.log(response)
-        this.tableData = response.data;
+        const response = await axios.get("http://localhost:8000/get-data/");
+        // console.log("response", response.data.data)
+        this.tableData = response.data.data;
       } catch (error) {
         console.error("Error fetching data:", error);
       }
@@ -129,8 +129,9 @@ export default {
               :key="index"
               class="transition-all duration-200 border-b last:border-0 hover:bg-blue-50 cursor-pointer even:bg-blue-50/50"
             >
-              <td class="px-6 py-3 text-gray-700 font-mono">{{ item.bk_id }}</td>
-              <td class="px-6 py-3 text-gray-800">{{ item.filename }}</td>
+              <td class="px-6 py-3 text-gray-700 font-mono">{{ item.id + 1}}</td>
+              <td class="px-6 py-3 text-gray-800">{{ item.payload.filename }}</td>
+              <td class="px-6 py-3 text-gray-800">{{ item.payload.text }}</td>
               <td class="px-6 py-3 text-gray-800 truncate max-w-xs">
                 {{ item.notes && item.notes.length > 60 ? item.notes.slice(0,60) + '…' : item.notes }}
                 <span v-if="item.notes && item.notes.length > 60" class="text-blue-500 ml-2 text-xs">(hover for more)</span>
@@ -163,14 +164,14 @@ export default {
               />
             </div>
             <!-- Notes Input -->
-            <div class="mb-4">
+            <!-- <div class="mb-4">
               <label for="notes" class="block text-sm font-semibold">Notes</label>
               <textarea
                 class="w-full p-2.5 border rounded"
                 v-model="newKnowledge.notes"
                 placeholder="Add notes here..."
               ></textarea>
-            </div>
+            </div> -->
             <div class="mb-4 hidden">
               <label for="created_at" class="block text-sm font-semibold">Time</label>
               <input
