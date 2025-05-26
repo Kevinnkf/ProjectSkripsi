@@ -143,7 +143,7 @@
 </template>
 
 <script>
-import axios from 'axios';
+import api from '../../services/axios.js'; 
 
 export default {
   name: 'ChatHistoryPage',
@@ -189,7 +189,8 @@ export default {
   methods: {
     async fetchChatHistory() {
       try {
-        const res = await axios.get('http://localhost:5000/api/chats/with-feedback');
+        // const res = await axios.get('http://localhost:5000/api/chats/with-feedback');
+        const res = await api.get("/chats/with-feedback");
         this.chatData = res.data;
       } catch (err) {
         console.error('Error fetching chat history:', err);

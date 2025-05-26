@@ -173,8 +173,8 @@ export default {
 
     async registerAdmin() {
       try {
-        const response = await axios.post(
-          "http://localhost:5000/api/admins/register",
+        const response = await api.post(
+          "admins/register",
           this.newAdmin
         );
         console.log("Success:", response.data);

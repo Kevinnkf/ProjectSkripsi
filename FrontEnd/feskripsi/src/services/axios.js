@@ -2,8 +2,14 @@
 import { useUserStore } from '@/components/Stores/UserStore.vue';
 import axios from 'axios';
 
+
+
 const api = axios.create({
+<<<<<<< HEAD
   baseURL: 'https://be-service-production.up.railway.app/',
+=======
+  baseURL: 'https://be-service-production.up.railway.app/api',
+>>>>>>> 82104710609e9e494f3b67cfc3ebcf02e2e310c9
   withCredentials: true,
 });
 

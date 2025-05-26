@@ -106,6 +106,7 @@
 <script setup>
 import { ref, onMounted } from 'vue';
 import { useUserStore } from '../Stores/UserStore.vue'; // Adjust path as needed
+import api from "../../services/axios.js";
 
 const userStore = useUserStore();
 const isModalOpen = ref(false);
@@ -136,7 +137,7 @@ const closeModal = () => {
 
 const resetPassword = async () => {
   try {
-    const response = await fetch('/api/reset-password', {
+    const response = await api.get('reset-password', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(updateAdmin.value),
