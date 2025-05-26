@@ -168,6 +168,7 @@
 <script>
 import Chart from 'chart.js/auto'
 import Swal from "sweetalert2"
+import { Axios } from 'axios';
 import api from "../../services/axios.js";
 
 export default {
@@ -196,7 +197,7 @@ export default {
   methods: {
     async fetchClassifiedData() {
         try {
-            const response = await fetch('http://127.0.0.1:8000/predict', {
+            const response = await Axios.get('https://0mhv7lxtz4anq2-8000.proxy.runpod.net/classify/', {
                 method: 'POST'
             });
             const data = await response.json();
