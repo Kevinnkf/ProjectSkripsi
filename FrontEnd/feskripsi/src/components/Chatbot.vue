@@ -36,8 +36,7 @@ const sendMessage = async () => {
     //   "https://be-service-production.up.railway.app/api/chats/post",
     //   userMessage
     // );
-    const response = await api.post(
-      "chats/post",
+    const response = await axios.post('https://0mhv7lxtz4anq2-8000.proxy.runpod.net/api/query',
       userMessage
     );
 
