@@ -24,7 +24,7 @@ app.get('/', (req, res) => {
 
 // Allow your frontend to talk to this API
 app.use(cors({
-  origin:      process.env.FRONTEND_URL || 'http://localhost:5173',
+  origin:      process.env.FRONTEND_URL || 'https://halo-pnj.vercel.app/',
   credentials: true,
   allowedHeaders: ['Authorization', 'Content-Type']
 }));
