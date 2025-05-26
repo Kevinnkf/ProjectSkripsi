@@ -2,6 +2,7 @@
 import { ref, onMounted, nextTick } from "vue";
 import axios from "axios";
 import Navbar from "./Navbar.vue";
+import api from "../services/axios.js";
 
 const message = ref("");
 const chatHistory = ref([]);
@@ -31,8 +32,12 @@ const sendMessage = async () => {
   message.value = "";
 
   try {
-    const response = await axios.post(
-      "http://localhost:5000/api/chats/post",
+    // const response = await axios.post(
+    //   "https://be-service-production.up.railway.app/api/chats/post",
+    //   userMessage
+    // );
+    const response = await api.post(
+      "chats/post",
       userMessage
     );
 
@@ -59,7 +64,7 @@ const sendFeedback = async (chat, type) => {
   }
   console.log('Feedback attempt:', { chat_id: chat.chat_id, response: type });
   try {
-    await axios.post("http://localhost:5000/api/feedback/post", {
+    await axios.post("feedback/post", {
       chat_id: chat.chat_id,
       response: type
     });

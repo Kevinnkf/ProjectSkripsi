@@ -1,7 +1,7 @@
 <script>
 import axios from 'axios';
 import Swal from 'sweetalert2';
-import api from '../../services/axios.js'; 
+
 
 export default {
   data() {
@@ -48,23 +48,17 @@ export default {
       }
 
       let formData = new FormData();
+      // console.log("this.newKnowledge.file:", this.newKnowledge.file);
+      // console.log("Instanceof File?", this.newKnowledge.file instanceof File);
       formData.append("file", this.newKnowledge.file); // File
-      // formData.append("notes", this.newKnowledge.notes || ""); // Notes (optional)
-      // formData.append("created_by", this.newKnowledge.created_by || "Unknown"); // Example additional fields
       console.log(formData)
       
       try {
-            const sendFile = await axios.post('http://localhost:8000/upload-bk/', formData, {
+            const sendFile = await axios.post('https://0mhv7lxtz4anq2-8000.proxy.runpod.net/upload-bk/', formData, {
               headers: {
                 'Content-Type': 'multipart/form-data'
               }
             });
-            // const sendFile = await axios.post("http://localhost:8000/upload-pdf/", formData, {
-            //   headers: {
-            //     "Content-Type": "multipart/form-data", 
-            //   },
-            // });  
-            // console.log("Upload success:", response);
             console.log("Upload success:", sendFile);
             Swal.fire("Success!", "PDF uploaded and processed successfully.", "success");
             this.newKnowledge.file = "";
@@ -78,7 +72,7 @@ export default {
 
     async fetchKnowledgeData() {
       try {
-        const response = await axios.get("http://localhost:8000/get-data/");
+        const response = await axios.get("https://0mhv7lxtz4anq2-8000.proxy.runpod.net/get-data/");
         // console.log("response", response.data.data)
         this.tableData = response.data.data;
       } catch (error) {
@@ -120,7 +114,7 @@ export default {
               <th class="px-6 py-4 text-left font-bold uppercase text-xs text-white tracking-widest border-b">ID</th>
               <th class="px-6 py-4 text-left font-bold uppercase text-xs text-white tracking-widest border-b">Filename</th>
               <th class="px-6 py-4 text-left font-bold uppercase text-xs text-white tracking-widest border-b">Notes</th>
-              <th class="px-6 py-4 text-left font-bold uppercase text-xs text-white tracking-widest border-b">Created At</th>
+              <!-- <th class="px-6 py-4 text-left font-bold uppercase text-xs text-white tracking-widest border-b">Created At</th> -->
             </tr>
           </thead>
           <tbody>
@@ -132,10 +126,10 @@ export default {
               <td class="px-6 py-3 text-gray-700 font-mono">{{ item.id + 1}}</td>
               <td class="px-6 py-3 text-gray-800">{{ item.payload.filename }}</td>
               <td class="px-6 py-3 text-gray-800">{{ item.payload.text }}</td>
-              <td class="px-6 py-3 text-gray-800 truncate max-w-xs">
+              <!-- <td class="px-6 py-3 text-gray-800 truncate max-w-xs">
                 {{ item.notes && item.notes.length > 60 ? item.notes.slice(0,60) + '…' : item.notes }}
                 <span v-if="item.notes && item.notes.length > 60" class="text-blue-500 ml-2 text-xs">(hover for more)</span>
-              </td>
+              </td> -->
               <td class="px-6 py-3 text-gray-600 font-mono">{{ item.created_at }}</td>
             </tr>
           </tbody>

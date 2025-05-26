@@ -62,6 +62,7 @@
 import axios from 'axios';
 import { useUserStore } from '../Stores/UserStore.vue';
 import Swal from 'sweetalert2';
+import api from "../../services/axios.js";
 
 export default {
   data() {
@@ -78,8 +79,8 @@ export default {
         return;
       }
       try {
-        const response = await axios.post(
-          'http://localhost:5000/api/admins/login', // Change to your backend route
+        const response = await api.post(
+          'admins/login', // Change to your backend route
           {
             nippm: nippmInt,  // Send the integer value of nippm
             password: this.password

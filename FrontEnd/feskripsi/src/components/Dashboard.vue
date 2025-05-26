@@ -139,7 +139,7 @@ export default {
   methods: {
     async fetchQuestionsThisWeek() {
       try {
-        const res = await fetch('http://localhost:5000/api/chats/count-this-week');
+        const res = await api.get('chats/count-this-week');
         const data = await res.json();
         this.questionsThisWeek = data.count || 0;
       } catch (err) {
@@ -170,7 +170,7 @@ export default {
     },
     async fetchChatData() {
       try {
-        const response = await fetch('http://localhost:5000/api/chats/get');
+        const response = await api.get('chats/get');
         const data = await response.json();
         const chatData = data.chats || [];
         this.chatData = chatData;
