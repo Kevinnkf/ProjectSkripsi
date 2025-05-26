@@ -3,7 +3,7 @@ import { useUserStore } from '@/components/Stores/UserStore.vue';
 import axios from 'axios';
 
 const api = axios.create({
-  baseURL: 'http://localhost:5000/api',
+  baseURL: 'https://be-service-production.up.railway.app/',
   withCredentials: true,
 });
 
