@@ -62,7 +62,7 @@ const sendFeedback = async (chat, type) => {
   }
   console.log('Feedback attempt:', { chat_id: chat.chat_id, response: type });
   try {
-    await axios.post("feedback/post", {
+    await api.post("feedback/post", {
       chat_id: chat.chat_id,
       response: type
     });
