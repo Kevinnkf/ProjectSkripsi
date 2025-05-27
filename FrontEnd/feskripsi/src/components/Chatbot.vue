@@ -28,7 +28,7 @@ const sendMessage = async () => {
   });
   scrollToBottom();
 
-  const userMessage = { query: message.value };
+  const userMessage = { message: message.value };
   message.value = "";
 
   try {
