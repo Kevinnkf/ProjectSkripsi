@@ -2,7 +2,7 @@
 import { ref, onMounted, nextTick } from "vue";
 import axios from "axios";
 import Navbar from "./Navbar.vue";
-import model from "../services/axios.js";
+import api from "../services/axios.js";
 
 const message = ref("");
 const chatHistory = ref([]);
@@ -32,13 +32,12 @@ const sendMessage = async () => {
   message.value = "";
 
   try {
-    // const response = await axios.post(
-    //   "https://be-service-production.up.railway.app/api/chats/post",
-    //   userMessage
-    // );
-    const response = await axios.post('https://88gnifz3jjl69b-8000.proxy.runpod.net/api/query',
+    const response = await api.post("/chats/post",
       userMessage
     );
+    // const response = await api.post('https://88gnifz3jjl69b-8000.proxy.runpod.net/api/query',
+    //   userMessage
+    // );
 
     // Extract the chat_id (could be response.data.chat_id or response.data.chatId)
     const chat_id = response.data.chat_id || response.data.chatId;
