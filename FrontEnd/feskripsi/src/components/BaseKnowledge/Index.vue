@@ -55,7 +55,7 @@ export default {
       console.log(formData)
       
       try {
-            const sendFile = await model.post('/upload-bk', formData, {
+            const sendFile = await axios.post('https://88gnifz3jjl69b-8000.proxy.runpod.net/upload-bk', formData, {
               headers: {
                 'Content-Type': 'multipart/form-data'
               }
@@ -73,7 +73,7 @@ export default {
 
     async fetchKnowledgeData() {
       try {
-        const response = await model.get("/get-data");
+        const response = await axios.get("https://88gnifz3jjl69b-8000.proxy.runpod.net/get-data");
         // console.log("response", response.data.data)
         this.tableData = response.data.data;
       } catch (error) {
