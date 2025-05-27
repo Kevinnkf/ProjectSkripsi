@@ -106,7 +106,8 @@ export default {
 
       } catch (error) {
         console.error("Login failed:", error.response?.data?.message || error.message);
-        alert(error.response?.data?.message || "Login failed");
+        Swal.fire("Login Failed", error.message || "Something went wrong", "error");
+        // alert(error.response?.data?.message || "Login failed");
       }
     }
   }
