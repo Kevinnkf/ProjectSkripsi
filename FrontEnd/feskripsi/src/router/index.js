@@ -13,12 +13,12 @@ import LandingPage from '@/components/Client/LandingPage.vue'
 
 const routes = [
   { path: '/login', name: 'login', component: Login, meta: { layout: 'blank' } },
-  { path: '/dashboard', component: Dashboard, meta: { layout: 'default', requiresAuth: false } },
-  { path: '/base-knowledge', component: BK, meta: { layout: 'default', requiresAuth: false } },
-  { path: '/chat-history', component: ChatHistory, meta: { layout: 'default', requiresAuth: false } },
-  { path: '/admins', component: Admins, meta: { layout: 'default', requiresAuth: false } },
-  { path: '/faq', component: FAQ, meta: { layout: 'default', requiresAuth: false } },
-  { path: '/settings', component: Settings, meta: { layout: 'default', requiresAuth: false } },
+  { path: '/dashboard', component: Dashboard, meta: { layout: 'default', requiresAuth: true } },
+  { path: '/base-knowledge', component: BK, meta: { layout: 'default', requiresAuth: true } },
+  { path: '/chat-history', component: ChatHistory, meta: { layout: 'default', requiresAuth: true } },
+  { path: '/admins', component: Admins, meta: { layout: 'default', requiresAuth: true } },
+  { path: '/faq', component: FAQ, meta: { layout: 'default', requiresAuth: true } },
+  { path: '/settings', component: Settings, meta: { layout: 'default', requiresAuth: true } },
   { path: '/chatbot', component: Chatbot, meta: { layout: 'blank' } },
   { path: '/hero', component: LandingPage, meta: { layout: 'blank' } },
 
