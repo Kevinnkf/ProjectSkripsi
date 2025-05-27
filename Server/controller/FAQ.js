@@ -50,7 +50,7 @@ export async function classifyFAQ(req, res) {
 
         const questions = chats.map(c => c.questions);
 
-        const response = await axios.post('http://localhost:8000/predict', {
+        const response = await axios.post(`${process.env.RAG_SERVICE_URL}/predict`, {
             questions,
         });
 

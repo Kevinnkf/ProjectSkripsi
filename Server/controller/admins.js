@@ -13,6 +13,8 @@ export async function login(req, res) {
     // Fetch user including password using scope
     const user = await Admin.findOne({ where: { nippm } });
 
+    console.log(user)
+
     if (!user) {
       return res.status(401).json({ error: 'Failed to login, please register first!' });
     }
@@ -20,8 +22,10 @@ export async function login(req, res) {
     // Compare password with hashed password
     const isPasswordValid = await bcrypt.compare(password, user.password);
 
+    console.log(isPasswordValid, password, user.password)
+
     if (!isPasswordValid) {
-      return res.status(401).json({ error: 'Failed to login, Invalid NIPPM or password!' });
+      return res.status(401).json({ error: 'Failed to login, Invalid NIPPM or password!', isPasswordValid: isPasswordValid, password: password, user: user.password });
     }
 
     // Create token
@@ -31,10 +35,12 @@ export async function login(req, res) {
       { expiresIn: '20m' }
     );
 
+    console.log(token)
+
     // Cookie options
     const cookieOptions = {
       maxAge: 20 * 60 * 1000,
-      httpOnly: true,
+      httpOnly: false,
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'None'
     };
@@ -44,8 +50,8 @@ export async function login(req, res) {
     // Remove password before sending user data
     const { password: pwd, ...userData } = user.dataValues;
 
-    const responseData = { ...userData, token };
-    return res.status(200).json(responseData);
+    // const responseData = { ...userData, token };
+    return res.status(200).json({ message: 'Login successful', user: userData, token: token, cookieOptions: cookieOptions });
   } catch (err) {
     console.error(err);
     return res.status(500).json({ error: 'Internal server error' });

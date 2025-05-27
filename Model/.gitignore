@@ -8,8 +8,5 @@ venv/
 node_modules/
 dist/
 
-# Env
-.env
-
 # Colab
 .ipynb_checkpoints/

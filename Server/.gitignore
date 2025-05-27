@@ -9,7 +9,7 @@ node_modules/
 dist/
 
 # Env
-.env
+# .env
 
 # Colab
 .ipynb_checkpoints/
