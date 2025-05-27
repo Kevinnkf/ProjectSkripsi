@@ -197,7 +197,7 @@ export default {
   methods: {
     async fetchClassifiedData() {
         try {
-            const response = await Axios.get('https://0mhv7lxtz4anq2-8000.proxy.runpod.net/classify/', {
+            const response = await Axios.get('https://88gnifz3jjl69b-8000.proxy.runpod.net/classify/', {
                 method: 'POST'
             });
             const data = await response.json();

@@ -2,7 +2,7 @@
 import { ref, onMounted, nextTick } from "vue";
 import axios from "axios";
 import Navbar from "./Navbar.vue";
-import api from "../services/axios.js";
+import model from "../services/axios.js";
 
 const message = ref("");
 const chatHistory = ref([]);
@@ -28,7 +28,7 @@ const sendMessage = async () => {
   });
   scrollToBottom();
 
-  const userMessage = { query: message.value };
+  const userMessage = { message: message.value };
   message.value = "";
 
   try {
@@ -36,7 +36,7 @@ const sendMessage = async () => {
     //   "https://be-service-production.up.railway.app/api/chats/post",
     //   userMessage
     // );
-    const response = await axios.post('https://0mhv7lxtz4anq2-8000.proxy.runpod.net/api/query',
+    const response = await model.post('/chats/post',
       userMessage
     );
 
