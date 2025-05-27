@@ -28,7 +28,8 @@ const sendMessage = async () => {
   });
   scrollToBottom();
 
-  const userMessage = { message: message.value };
+  // const userMessage = { message: message.value };
+  const userMessage = { query: message.value };
   message.value = "";
 
   try {
@@ -36,7 +37,7 @@ const sendMessage = async () => {
     //   "https://be-service-production.up.railway.app/api/chats/post",
     //   userMessage
     // );
-    const response = await axios.post('https://88gnifz3jjl69b-8000.proxy.runpod.net/chats/post',
+    const response = await axios.post('https://88gnifz3jjl69b-8000.proxy.runpod.net/api/query',
       userMessage
     );
 
