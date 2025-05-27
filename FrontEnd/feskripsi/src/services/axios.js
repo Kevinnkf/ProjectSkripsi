@@ -2,9 +2,6 @@
 // import { useUserStore } from '@/components/Stores/UserStore.vue';
 import axios from 'axios';
 
-const model = axios.create({
-  baseURL: 'https://88gnifz3jjl69b-8000.proxy.runpod.net/api'
-});
 
 
 const api = axios.create({
@@ -23,4 +20,4 @@ api.interceptors.request.use((config) => {
 return config;
 });
 
-export default { api, model };
+export default api;
