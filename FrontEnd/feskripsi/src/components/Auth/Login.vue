@@ -56,6 +56,7 @@
 import { useUserStore } from '../Stores/UserStore.vue';
 import Swal from 'sweetalert2';
 import api from "../../services/axios.js";
+import axios from 'axios';
 
 export default {
   data() {
@@ -65,32 +66,45 @@ export default {
     };
   },
   methods: {
-    async loginUser() {
-      try {
-        const response = await api.post(
-          'admins/login',
-          {
-            nippm: parseInt(this.nippm, 10),
-            password: this.password
-          },
-          {
-            withCredentials: true // ✅ enable cookie handling
-          }
-        );
+  async loginUser() {
+    try {
+      // const response = await api.post(
+      //   'admins/login',
+      //   {
+      //     nippm: parseInt(this.nippm, 10),
+      //     password: this.password
+      //   },
+      //   {
+      //     withCredentials: true 
+      //   }
+      // );
+      const response = await axios.post(
+        'http://localhost:5000/api/admins/login',
+        {
+          nippm: parseInt(this.nippm, 10),
+          password: this.password
+        },
+        {
+          withCredentials: true 
+        }
+      );
 
-        const userStore = useUserStore();
-        userStore.setUser(response.data.user); // ✅ use cookie-backed session
+      // Save the token for later API calls
+      localStorage.setItem('token', response.data.token);
 
-        Swal.fire("Success!", "Successfully Logged in.", "success").then(() => {
-          const redirectPath = localStorage.getItem('redirectPath') || '/dashboard';
-          localStorage.removeItem('redirectPath');
-          this.$router.push(redirectPath);
-        });
-      } catch (error) {
-        console.error("Login failed:", error.response?.data?.message || error.message);
-        Swal.fire("Error", error.response?.data?.message || "Login failed", "error");
-      }
+      // Set user in your store
+      const userStore = useUserStore();
+      userStore.setUser(response.data.user); 
+
+      Swal.fire("Success!", "Successfully Logged in.", "success").then(() => {
+        const redirectPath = localStorage.getItem('redirectPath') || '/dashboard';
+        localStorage.removeItem('redirectPath');
+        this.$router.push(redirectPath);
+      });
+    } catch (error) {
+      Swal.fire("Error", error.response?.data?.message || "Login failed", "error");
     }
   }
+}
 };
 </script>
