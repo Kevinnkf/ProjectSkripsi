@@ -52,59 +52,52 @@
   </div>
 </template>
 
-<script>
-import { useUserStore } from '../Stores/UserStore.vue';
-import Swal from 'sweetalert2';
-import api from "../../services/axios.js";
-import axios from 'axios';
+  <script>
+  import { useUserStore } from '../Stores/UserStore.vue';
+  import Swal from 'sweetalert2';
+  import api from "../../services/axios.js";
+  import axios from 'axios';
 
-export default {
-  data() {
-    return {
-      nippm: '',
-      password: ''
-    };
-  },
-  methods: {
-  async loginUser() {
-    try {
-      // const response = await api.post(
-      //   'admins/login',
-      //   {
-      //     nippm: parseInt(this.nippm, 10),
-      //     password: this.password
-      //   },
-      //   {
-      //     withCredentials: true 
-      //   }
-      // );
-      const response = await axios.post(
-        'http://localhost:5000/api/admins/login',
-        {
-          nippm: parseInt(this.nippm, 10),
-          password: this.password
-        },
-        {
-          withCredentials: true 
-        }
-      );
+  export default {
+    data() {
+      return {
+        nippm: '',
+        password: ''
+      };
+    },
+    methods: {
+    async loginUser() {
+      try {
+        const response = await api.post(
+          'admins/login',
+          {
+            nippm: parseInt(this.nippm, 10),
+            password: this.password
+          },
+          {
+            withCredentials: true 
+          }
+        );
 
-      // Save the token for later API calls
-      localStorage.setItem('token', response.data.token);
+        localStorage.setItem('token', response.data.token);
 
-      // Set user in your store
-      const userStore = useUserStore();
-      userStore.setUser(response.data.user); 
+        const storedToken = localStorage.getItem('token');
+        console.log("Token retrieved from localStorage immediately:", storedToken);
 
-      Swal.fire("Success!", "Successfully Logged in.", "success").then(() => {
-        const redirectPath = localStorage.getItem('redirectPath') || '/dashboard';
-        localStorage.removeItem('redirectPath');
-        this.$router.push(redirectPath);
-      });
-    } catch (error) {
-      Swal.fire("Error", error.response?.data?.message || "Login failed", "error");
+
+        // Set user in your store
+        const userStore = useUserStore();
+        userStore.setUser(response.data.user);
+
+        Swal.fire("Success!", "Successfully Logged in.", "success").then(() => {
+          const redirectPath = localStorage.getItem('redirectPath') || '/dashboard';
+          localStorage.removeItem('redirectPath');
+          this.$router.push(redirectPath);
+        });
+      } catch (error) {
+        Swal.fire("Error", error.response?.data?.message || "Login failed", "error");
+      }
     }
   }
-}
-};
-</script>
+  };
+  </script>

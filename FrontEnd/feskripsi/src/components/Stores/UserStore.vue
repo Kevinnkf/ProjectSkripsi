@@ -9,7 +9,6 @@ export const useUserStore = defineStore('user', () => {
   const setUser = (userData) => {
     nippm.value = userData.nippm
     role.value = userData.role
-    localStorage.setItem('token', userData.token); // optional: store token
   }
 
   const clearUser = () => {
