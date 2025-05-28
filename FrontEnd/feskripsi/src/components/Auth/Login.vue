@@ -68,7 +68,7 @@ export default {
     async loginUser() {
       try {
         const response = await api.post(
-          'admins/login',
+          '/admins/login',
           {
             nippm: parseInt(this.nippm, 10),
             password: this.password
