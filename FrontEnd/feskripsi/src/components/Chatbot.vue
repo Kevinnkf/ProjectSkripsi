@@ -32,14 +32,12 @@ const sendMessage = async () => {
   message.value = "";
 
   try {
-    // const response = await axios.post(
-    //   "https://be-service-production.up.railway.app/api/chats/post",
-    //   userMessage
-    // );
-    const response = await api.post(
-      "chats/post",
+    const response = await api.post("/chats/post",
       userMessage
     );
+    // const response = await api.post('https://88gnifz3jjl69b-8000.proxy.runpod.net/api/query',
+    //   userMessage
+    // );
 
     // Extract the chat_id (could be response.data.chat_id or response.data.chatId)
     const chat_id = response.data.chat_id || response.data.chatId;
@@ -64,7 +62,7 @@ const sendFeedback = async (chat, type) => {
   }
   console.log('Feedback attempt:', { chat_id: chat.chat_id, response: type });
   try {
-    await axios.post("feedback/post", {
+    await api.post("feedback/post", {
       chat_id: chat.chat_id,
       response: type
     });
@@ -89,6 +87,7 @@ const hasFeedback = (chat, type) => {
 </script>
 
 <template>
+<div>
 <Navbar/>
   <div class="d-flex flex-column">
     <!-- Chat Section -->
@@ -173,6 +172,7 @@ const hasFeedback = (chat, type) => {
       </div>
     </div>
   </div>
+</div>
 </template>
 
 

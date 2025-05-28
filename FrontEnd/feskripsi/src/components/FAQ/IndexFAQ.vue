@@ -168,6 +168,7 @@
 <script>
 import Chart from 'chart.js/auto'
 import Swal from "sweetalert2"
+import { Axios } from 'axios';
 import api from "../../services/axios.js";
 import ragApi from "../../services/ragAxios.js";
 import axios from 'axios';

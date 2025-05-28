@@ -1,6 +1,7 @@
 <script>
 import axios from 'axios';
 import Swal from 'sweetalert2';
+import model from "../../services/axios.js";
 
 
 export default {
@@ -54,7 +55,7 @@ export default {
       console.log(formData)
       
       try {
-            const sendFile = await axios.post('https://rd6aysl31va2se-8000.proxy.runpod.net/upload-bk/', formData, {
+            const sendFile = await axios.post('https://88gnifz3jjl69b-8000.proxy.runpod.net/upload-bk', formData, {
               headers: {
                 'Content-Type': 'multipart/form-data'
               }
