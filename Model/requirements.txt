@@ -21,7 +21,7 @@ qdrant-client
 python-dotenv
 python-multipart
 sqlmodel
-
+pathlib
 
 # fastapi
 # uvicorn[standard]

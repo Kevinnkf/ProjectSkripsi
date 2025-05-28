@@ -12,6 +12,7 @@ import pandas as pd
 import openpyxl
 import joblib
 import httpx
+from pathlib import Path
 
 from app.config import QDRANT_URL, QDRANT_API_KEY, COLLECTION_NAME
 
@@ -23,8 +24,12 @@ CHUNK_OVERLAP = 200
 
 client = QdrantClient(url=QDRANT_URL, api_key=QDRANT_API_KEY)
 
-vectorizer = joblib.load('./tfidf_vectorizer.pkl')
-model = joblib.load('./faq_classifier_model.pkl')
+BASE = Path(__file__).parent  
+vectorizer = joblib.load(BASE / 'tfidf_vectorizer.pkl')
+model      = joblib.load(BASE / 'faq_classifier_model.pkl')
+
+# vectorizer = joblib.load('./tfidf_vectorizer.pkl')
+# model = joblib.load('./faq_classifier_model.pkl')
 
 if not client.collection_exists(COLLECTION_NAME):
     client.recreate_collection(
