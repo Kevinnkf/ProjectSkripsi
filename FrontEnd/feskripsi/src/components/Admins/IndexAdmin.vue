@@ -164,7 +164,7 @@ export default {
 
     async deleteAdmin() {
       try {
-        const response = await axios.delete("http://localhost:5000/api/admins/deleteById")
+        const response = await api.delete(`/admins/delete/${item.id}`);
         console.log(response.data)
       } catch (error) {
         console.error(error)  

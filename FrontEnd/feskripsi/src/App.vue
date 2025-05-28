@@ -6,7 +6,7 @@ import { useUserStore } from './components/Stores/UserStore.vue'
 import  BlankLayout  from './Layout/BlankLayout.vue'
 
 onMounted(() => {
-  useUserStore().restoreUserFromToken
+  useUserStore().restoreUserFromToken()
 })
 
 const route = useRoute()

@@ -243,12 +243,12 @@
 <script>
 import { useUserStore } from '@/components/Stores/UserStore.vue'
 import Swal from 'sweetalert2'
+import api from '@/services/axios.js' // ✅ Use your axios instance
 
 export default {
   setup() {
     const userStore = useUserStore()
     return { userStore }
-
   },
   data() {
     return {
@@ -289,7 +289,7 @@ export default {
     goToResetPassword() {
       this.$router.push('/settings')
     },
-    logout() {  
+    logout() {
       Swal.fire({
         title: "Are you sure you want to log out?",
         text: "You will have to re-login.",
@@ -299,14 +299,31 @@ export default {
         cancelButtonColor: "#064E3B",
         confirmButtonText: "Yes, log out!",
         cancelButtonText: "Cancel"
-      }).then((result) => {
+      }).then(async (result) => {
         if (result.isConfirmed) {
-          localStorage.removeItem('token');  // Remove the token from localStorage
-          this.$router.push('/login');       // Redirect to login page
+          try {
+            // use axios instance to log out
+            await api.post('admins/logout', {}, { withCredentials: true })
+
+            // clear Pinia store
+            const userStore = useUserStore();
+            userStore.token = null;
+            userStore.nippm = null;
+            userStore.role = null;
+
+            // remove token from localStorage
+            localStorage.removeItem('token')
+
+            // redirect to login
+            this.$router.push('/login')
+          } catch (err) {
+            console.error('Logout failed:', err)
+            Swal.fire("Error", "Failed to log out. Try again.", "error")
+          }
         }
-      });
-    },
-  },
+      })
+    }
+  }
 }
 </script>
 

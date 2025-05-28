@@ -137,11 +137,13 @@ const closeModal = () => {
 
 const resetPassword = async () => {
   try {
-    const response = await api.get('reset-password', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(updateAdmin.value),
-    });
+    const response = await api.post('/admins/reset-password', updateAdmin.value);
+
+    // const response = await api.get('reset-password', {
+      // method: 'POST',
+      // headers: { 'Content-Type': 'application/json' },
+      // body: JSON.stringify(updateAdmin.value),
+    // });
 
     const result = await response.json();
 

@@ -169,6 +169,8 @@
 import Chart from 'chart.js/auto'
 import Swal from "sweetalert2"
 import api from "../../services/axios.js";
+import ragApi from "../../services/ragAxios.js";
+import axios from 'axios';
 
 export default {
   data() {
@@ -196,33 +198,27 @@ export default {
   methods: {
     async fetchClassifiedData() {
         try {
-            const response = await fetch('http://127.0.0.1:8000/predict', {
-                method: 'POST'
-            });
-            const data = await response.json();
-
+            const res = await ragApi.post("/predict", {});
+            const data = res.data;
+            
             const questions = data.questions || [];
             const categories = data.predicted_categories || [];
 
             // Combine into one array of objects
-            const classifyData = questions.map((question, index) => ({
-            questions: question,
-            predicted_category: categories[index],
-            createdAt: new Date().toISOString(), // You can replace this with actual dates if available
-            }));
-
-            this.categoryData = classifyData;
-
+            this.categoryData = questions.map((question, index) => ({
+              questions: question,
+              predicted_category: categories[index],
+              createdAt: new Date().toISOString(),
+              }));
         } catch (err) {
-            console.error("Failed to fetch questions count this week:", err);
+          console.error("Failed to fetch classification data:", err);
         }
     },
 
     async fetchQuestionsThisWeek() {
       try {
-        const res = await fetch('https://be-service-production.up.railway.app/api/chats/count-this-week');
-        const data = await res.json();
-        this.questionsThisWeek = data.count || 0;
+        const res = await api.get('/chats/count-this-week');
+        this.questionsThisWeek = res.data.count || 0;
       } catch (err) {
         console.error("Failed to fetch questions count this week:", err);
       }

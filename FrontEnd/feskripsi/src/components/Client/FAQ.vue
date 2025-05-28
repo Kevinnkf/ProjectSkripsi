@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import { ref, onMounted } from "vue";
 import api from "../../services/axios";
+import axios from 'axios';
+
 const tableData = ref([]);
 onMounted(async () => {
   try {

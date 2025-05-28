@@ -2,7 +2,7 @@
   <div class="flex items-center justify-center">
     <!-- Left Column (Image Section) -->
     <div class="hidden md:flex w-1/2 items-center justify-center">
-      <img src="@/assets/vector-login.jpg" alt="Login Illustration" class="w-3/4">
+      <img src="@/assets/vector-login.jpg" alt="Login Illustration" class="w-3/4" />
     </div>
 
     <!-- Right Column (Login Form) -->
@@ -11,11 +11,11 @@
         <h2 class="text-3xl font-bold text-center mb-6">Login</h2>
 
         <form @submit.prevent="loginUser">
-          <!-- NIPP Field -->
+          <!-- NIPPM Field -->
           <div class="mb-4">
             <label class="block text-gray-700 font-bold mb-2" for="nippm">NIPPM</label>
             <input
-              v-model="nippm" 
+              v-model="nippm"
               class="w-full px-4 py-3 rounded border border-gray-300 focus:ring focus:ring-blue-300"
               id="nippm"
               name="nippm"
@@ -29,7 +29,7 @@
           <div class="mb-4">
             <label class="block text-gray-700 font-bold mb-2" for="password">Password</label>
             <input
-              v-model="password" 
+              v-model="password"
               class="w-full px-4 py-3 rounded border border-gray-300 focus:ring focus:ring-blue-300"
               id="password"
               name="password"
@@ -37,12 +37,6 @@
               placeholder="********"
               required
             />
-          </div>
-
-          <!-- Remember Me Checkbox -->
-          <div class="flex items-center mb-4">
-            <input class="mr-2" type="checkbox" name="remember" id="remember" />
-            <label for="remember" class="text-gray-600 text-sm">Remember me</label>
           </div>
 
           <!-- Submit Button -->
@@ -59,7 +53,6 @@
 </template>
 
 <script>
-import axios from 'axios';
 import { useUserStore } from '../Stores/UserStore.vue';
 import Swal from 'sweetalert2';
 import api from "../../services/axios.js";
@@ -67,46 +60,35 @@ import api from "../../services/axios.js";
 export default {
   data() {
     return {
-      nippm: '',  // Corrected to match the input's v-model
+      nippm: '',
       password: ''
     };
   },
   methods: {
     async loginUser() {
-      const nippmInt = parseInt(this.nippm, 10);  // Convert to an integer
-      if (isNaN(nippmInt)) {
-        alert('Please enter a valid NIPP');
-        return;
-      }
       try {
         const response = await api.post(
-          'admins/login', // Change to your backend route
+          'admins/login',
           {
-            nippm: nippmInt,  // Send the integer value of nippm
+            nippm: parseInt(this.nippm, 10),
             password: this.password
           },
           {
-            withCredentials: true // Allow cookies
+            withCredentials: true // ✅ enable cookie handling
           }
         );
-        const userData = {
-          nippm: response.data.nippm,
-          role: response.data.role
-          
-        }
-        const userStore = useUserStore()
-        userStore.setUser(userData);
 
-        // Store token in localStorage (or use cookies if preferred)
-        localStorage.setItem('token', response.data.token);
+        const userStore = useUserStore();
+        userStore.setUser(response.data.user); // ✅ use cookie-backed session
 
         Swal.fire("Success!", "Successfully Logged in.", "success").then(() => {
-          this.$router.push('/dashboard');
+          const redirectPath = localStorage.getItem('redirectPath') || '/dashboard';
+          localStorage.removeItem('redirectPath');
+          this.$router.push(redirectPath);
         });
-
       } catch (error) {
         console.error("Login failed:", error.response?.data?.message || error.message);
-        alert(error.response?.data?.message || "Login failed");
+        Swal.fire("Error", error.response?.data?.message || "Login failed", "error");
       }
     }
   }

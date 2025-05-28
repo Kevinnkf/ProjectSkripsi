@@ -140,7 +140,7 @@ export default {
     async fetchQuestionsThisWeek() {
       try {
         const res = await api.get('chats/count-this-week');
-        const data = await res.json();
+        const data = res.data;
         this.questionsThisWeek = data.count || 0;
       } catch (err) {
         console.error("Failed to fetch questions count this week:", err);
@@ -171,7 +171,7 @@ export default {
     async fetchChatData() {
       try {
         const response = await api.get('chats/get');
-        const data = await response.json();
+        const data = res.data;
         const chatData = data.chats || [];
         this.chatData = chatData;
 

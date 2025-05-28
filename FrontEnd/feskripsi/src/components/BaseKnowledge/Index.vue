@@ -54,7 +54,7 @@ export default {
       console.log(formData)
       
       try {
-            const sendFile = await axios.post('https://0mhv7lxtz4anq2-8000.proxy.runpod.net/upload-bk/', formData, {
+            const sendFile = await axios.post('https://rd6aysl31va2se-8000.proxy.runpod.net/upload-bk/', formData, {
               headers: {
                 'Content-Type': 'multipart/form-data'
               }
@@ -72,9 +72,8 @@ export default {
 
     async fetchKnowledgeData() {
       try {
-        const response = await axios.get("https://0mhv7lxtz4anq2-8000.proxy.runpod.net/get-data/");
-        // console.log("response", response.data.data)
-        this.tableData = response.data.data;
+        const { data } = await axios.get(`${import.meta.env.VITE_RAG_API}/get-data/`);
+        this.tableData = data.data;
       } catch (error) {
         console.error("Error fetching data:", error);
       }
