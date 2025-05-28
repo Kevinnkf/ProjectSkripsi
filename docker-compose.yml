@@ -27,7 +27,7 @@ services:
       HF_HOME: /workspace/models
       QDRANT_URL: https://48b49ac1-8387-42bb-b0d7-10587d2aa625.eu-west-1-0.aws.cloud.qdrant.io
       QDRANT_API_KEY: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhY2Nlc3MiOiJtIn0.1ugiYzO7TerHdVXROwWBNgIMkv3zMymBGeMrKXVvm68
-      COLLECTION_NAME: rag-langchain-large
+      COLLECTION_NAME: rag-academics-collection-small
 
 volumes:
   rag_model_cache:
