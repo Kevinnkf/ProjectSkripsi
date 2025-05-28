@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.routes import router as api_router
-# from app.rag import init_models
+from app.processing_router import router as processing_router
 
 app = FastAPI(title="RAG Retrieval API")
 
@@ -21,4 +21,6 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# Mount routers
 app.include_router(api_router, prefix="/api")
+app.include_router(processing_router)

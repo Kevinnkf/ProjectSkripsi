@@ -1,15 +1,59 @@
 fastapi
 uvicorn[standard]
 langchain
+langchain-community
 huggingface_hub[hf_xet]
 hf_xet
-qdrant-client
-sentence-transformers
-python-dotenv
-langchain-community
 transformers
+sentence-transformers
+torch
 bitsandbytes
 accelerate
-sqlmodel
+httpx
+tqdm
+pandas
+numpy
+scikit-learn
+joblib
 openpyxl
 PyMuPDF
+qdrant-client
+python-dotenv
+python-multipart
+sqlmodel
+
+
+# fastapi
+# uvicorn[standard]
+
+# # core LangChain + LangChain integrations
+# langchain-community
+# langchain-huggingface
+# langchain-qdrant
+
+# # transformers & quantization
+# transformers
+# bitsandbytes
+# accelerate
+
+# # embeddings
+# sentence-transformers
+
+# # qdrant
+# qdrant-client
+
+# # huggingFace model hub support
+# huggingface_hub[hf_xet]
+
+# # NLP Evaluation
+# # nltk
+# # rouge-score
+# # bert-score
+# # evaluate
+
+# # config and utils
+# python-dotenv
+# sqlmodel
+# openpyxl
+# PyMuPDF
+# joblib

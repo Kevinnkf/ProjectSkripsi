@@ -1,26 +1,31 @@
-# # model/Dockerfile
 FROM python:3.10-slim
+
 WORKDIR /app
 
-# install system deps
+# System deps
 RUN apt-get update && apt-get install -y --no-install-recommends \
     build-essential \
+    curl \
     && rm -rf /var/lib/apt/lists/*
 
-# copy & install Python deps
+# Set Hugging Face cache dir
+ENV HF_HOME=/workspace/models
+
+# Install Python dependencies
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-# copy your code
+# Copy all project files (assumes you run docker build from Model/)
 COPY . .
 
-# expose port and start uvicorn
-EXPOSE 8000
-
-# healtcheck
+# Healthcheck
 HEALTHCHECK --interval=10s --timeout=3s --retries=3 \
   CMD curl -f http://localhost:8000/health || exit 1
-  
+
+# Expose FastAPI port
+EXPOSE 8000
+
+# Launch FastAPI
 CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
 
 
