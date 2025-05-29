@@ -93,10 +93,16 @@
               :key="index"
               class="transition-all duration-200 border-b last:border-0 hover:bg-blue-50 cursor-pointer even:bg-blue-50/50"
             >
-              <td class="px-4 py-2 text-center border text-gray-600">{{ item.question }}</td>
+              <td class="px-4 py-2 text-center border text-gray-600">{{ item.matched_faq_question }}</td>
               <td class="px-4 py-2 text-center border text-gray-600">{{ item.answer }}</td>
               <td class="px-4 py-2 text-center border text-gray-600">{{ item.frequency }}</td>
-              <td class="px-4 py-2 text-center border text-gray-600">{{ item.relatedQuestions }}</td>
+              <td class="px-4 py-2 text-left border text-gray-600">
+                <ul class="list-disc list-inside space-y-1 text-sm">
+                  <li v-for="(related, i) in item.relatedQuestions.slice(0,2  )" :key="i">
+                    {{ related }}
+                  </li>
+                </ul>
+              </td>
               <!-- <td class="px-4 py-2 text-center border text-gray-600">
                 <div class="flex justify-center gap-2">
                   <button
@@ -209,6 +215,7 @@ export default {
         this.categoryData = results.map(item => ({
           question: item.question, 
           answer: item.answer,
+          matched_faq_question: item.matched_faq_question,
           frequency: item.frequency,
           relatedQuestions: item.related_questions,
           createdAt: new Date().toISOString(),
