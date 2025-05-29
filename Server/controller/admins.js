@@ -40,8 +40,8 @@ export async function login(req, res) {
     // Cookie options
     const cookieOptions = {
       maxAge: 20 * 60 * 1000,
-      httpOnly: false,
-      secure: process.env.NODE_ENV === 'production',
+      httpOnly: true,
+      secure: true,
       sameSite: 'None'
     };
 
