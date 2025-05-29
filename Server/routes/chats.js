@@ -4,7 +4,7 @@ import { sendMessageToBot, getMessageHistory, getChatsWithFeedback, getQuestions
 
 const router = express.Router();
 
-router.get('/',  isAuthenticated, getAllChatHistory);
+router.get('/', getAllChatHistory);
 router.get('/get', isAuthenticated, getMessageHistory);
 router.post('/post', sendMessageToBot);
 

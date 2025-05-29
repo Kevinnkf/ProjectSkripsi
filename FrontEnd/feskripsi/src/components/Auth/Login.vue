@@ -52,19 +52,20 @@
   </div>
 </template>
 
-<script>
-import { useUserStore } from '../Stores/UserStore.vue';
-import Swal from 'sweetalert2';
-import api from "../../services/axios.js";
+  <script>
+  import { useUserStore } from '../Stores/UserStore.vue';
+  import Swal from 'sweetalert2';
+  import api from "../../services/axios.js";
+  import axios from 'axios';
 
-export default {
-  data() {
-    return {
-      nippm: '',
-      password: ''
-    };
-  },
-  methods: {
+  export default {
+    data() {
+      return {
+        nippm: '',
+        password: ''
+      };
+    },
+    methods: {
     async loginUser() {
       try {
         const response = await api.post(
@@ -74,12 +75,19 @@ export default {
             password: this.password
           },
           {
-            withCredentials: true // ✅ enable cookie handling
+            withCredentials: true 
           }
         );
 
+        localStorage.setItem('token', response.data.token);
+
+        const storedToken = localStorage.getItem('token');
+        console.log("Token retrieved from localStorage immediately:", storedToken);
+
+
+        // Set user in your store
         const userStore = useUserStore();
-        userStore.setUser(response.data.user); // ✅ use cookie-backed session
+        userStore.setUser(response.data.user);
 
         Swal.fire("Success!", "Successfully Logged in.", "success").then(() => {
           const redirectPath = localStorage.getItem('redirectPath') || '/dashboard';
@@ -87,10 +95,9 @@ export default {
           this.$router.push(redirectPath);
         });
       } catch (error) {
-        console.error("Login failed:", error.response?.data?.message || error.message);
         Swal.fire("Error", error.response?.data?.message || "Login failed", "error");
       }
     }
   }
-};
-</script>
+  };
+  </script>

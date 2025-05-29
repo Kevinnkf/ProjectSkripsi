@@ -1,5 +1,6 @@
 from fastapi import APIRouter, UploadFile, File
 from fastapi.responses import JSONResponse
+from fastapi import Query
 import fitz
 import os
 import re
@@ -9,9 +10,10 @@ from langchain.text_splitter import RecursiveCharacterTextSplitter
 from qdrant_client import QdrantClient
 from qdrant_client.models import VectorParams, Distance
 import pandas as pd
-import openpyxl
+import pickle
 import joblib
 import httpx
+import openpyxl
 from pathlib import Path
 
 from app.config import QDRANT_URL, QDRANT_API_KEY, COLLECTION_NAME
@@ -38,6 +40,14 @@ if not client.collection_exists(COLLECTION_NAME):
     )
 
 embed_model = SentenceTransformer('intfloat/multilingual-e5-small')
+
+# Load model once on startup
+with open("faq_cluster_model.pkl", "rb") as f:
+    model_data_cluster = pickle.load(f)
+
+kmeans_model = model_data_cluster["kmeans"]
+sentence_model = SentenceTransformer(model_data_cluster["sentence_model_name"])
+faq_data = model_data_cluster["faq_data"]
 
 def clean_text(text):
     chars_to_space = [
@@ -150,28 +160,35 @@ async def upload_pdf(file: UploadFile = File(...)):
         })
 
 @router.get("/get-data")
-async def get_data():
+async def get_data(page: int = Query(1, ge=1), limit: int = Query(5, ge=1)):
     try:
+        offset = (page - 1) * limit
+
         response = client.scroll(
             collection_name=COLLECTION_NAME,
-            limit=5
+            offset=offset,
+            limit=limit
         )
+
         points = [r.dict() if hasattr(r, 'dict') else r for r in response[0]]
+
         return JSONResponse(status_code=200, content={
             "message": "Success fetching data",
-            "data": points
+            "data": points,
+            "page": page,
+            "limit": limit,
+            "has_more": len(points) == limit  # for frontend to know if there's more
         })
     except Exception as e:
         return JSONResponse(status_code=500, content={
             "message": "Failed fetching data",
             "error": str(e)
         })
-
+    
 @router.post("/predict")
 async def predict_from_chat_messages():
     try:
         BACKEND_URL = os.getenv("BACKEND_URL", "https://be-service-production.up.railway.app")
-
         async with httpx.AsyncClient() as client:
             response = await client.get(f"{BACKEND_URL}/api/chats")
             chat_data = response.json()
@@ -181,16 +198,54 @@ async def predict_from_chat_messages():
         if not questions:
             return JSONResponse(status_code=400, content={"error": "No user messages found"})
 
-        vec_questions = vectorizer.transform(questions)
-        predictions = model.predict(vec_questions)
+        # Embed user questions
+        embeddings = sentence_model.encode(questions)
 
-        return JSONResponse(content={
-            "questions": questions,
-            "predicted_categories": predictions.tolist()
-        })
+        # Predict clusters
+        cluster_predictions = kmeans_model.predict(embeddings)
+
+        # Match predictions to FAQ data
+        results = []
+        for q, cluster_id in zip(questions, cluster_predictions):
+            faq = next((item for item in faq_data if item["Cluster"] == cluster_id), None)
+            if faq:
+                results.append({
+                    "question": q,
+                    "matched_faq_question": faq["Question"],
+                    "answer": faq["Answer"],
+                    "frequency": faq["Frequency"],
+                    "related_questions": faq["Related Questions"]
+                })
+
+        return JSONResponse(content={"results": results})
 
     except Exception as e:
         return JSONResponse(status_code=500, content={"error": str(e)})
+
+# @router.post("/predict")
+# async def predict_from_chat_messages():
+#     try:
+#         BACKEND_URL = os.getenv("BACKEND_URL", "https://be-service-production.up.railway.app")
+
+#         async with httpx.AsyncClient() as client:
+#             response = await client.get(f"{BACKEND_URL}/api/chats")
+#             chat_data = response.json()
+
+#         questions = [chat["user_message"] for chat in chat_data if "user_message" in chat]
+
+#         if not questions:
+#             return JSONResponse(status_code=400, content={"error": "No user messages found"})
+
+#         vec_questions = vectorizer.transform(questions)
+#         predictions = model.predict(vec_questions)
+
+#         return JSONResponse(content={
+#             "questions": questions,
+#             "predicted_categories": predictions.tolist()
+#         })
+
+#     except Exception as e:
+#         return JSONResponse(status_code=500, content={"error": str(e)})
 
 
 # from fastapi import APIRouter, UploadFile, File

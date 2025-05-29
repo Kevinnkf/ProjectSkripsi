@@ -2,7 +2,7 @@
 import Navbar from "@/components/Navbar.vue";
 import Sidebar from "../components/Sidebar.vue";
 import { onMounted, ref } from 'vue'
-import { useUserStore } from '@/components/Stores/UserStore.vue'
+import { useUserStore } from '../components/Stores/UserStore.vue'
 
 const userStore = useUserStore()
 const isSidebarOpen = ref(false)

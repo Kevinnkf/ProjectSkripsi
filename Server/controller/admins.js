@@ -3,6 +3,7 @@ import bcrypt, { hash } from 'bcrypt';
 import pool from '../config/db.js'; // Assuming this is ESM
 import db from '../models/index.js';
 import { Op } from 'sequelize';
+import { config } from 'dotenv';
 
 const Admin = db.admins;
 
@@ -34,6 +35,7 @@ export async function login(req, res) {
       process.env.SECRET_ACCESS_TOKEN,
       { expiresIn: '20m' }
     );
+    console.log('NODE_ENV:', process.env.NODE_ENV);
 
     console.log(token)
 

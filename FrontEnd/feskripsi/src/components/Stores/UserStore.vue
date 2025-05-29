@@ -14,13 +14,29 @@ export const useUserStore = defineStore('user', () => {
   const clearUser = () => {
     nippm.value = null
     role.value = null
+    localStorage.removeItem('token')
+  }
+
+  const restoreUserFromToken = () => {
+    const token = localStorage.getItem('token');
+    if (!token) return;
+
+    try {
+      const payload = JSON.parse(atob(token.split('.')[1]));
+      nippm.value = payload.nippm;
+      role.value = payload.role;
+    } catch (error) {
+      console.error('Failed to decode token:', error);
+      clearUser();
+    }
   }
 
   return {
     nippm,
     role,
     setUser,
-    clearUser
+    clearUser,
+    restoreUserFromToken
   }
 })
 </script>

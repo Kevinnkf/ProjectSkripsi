@@ -82,7 +82,9 @@
           <thead class="bg-[#064E3B]">
             <tr>
               <th class="px-6 py-4 text-left font-bold uppercase text-xs text-white tracking-widest border-b">Question</th>
-              <th class="px-6 py-4 text-left font-bold uppercase text-xs text-white tracking-widest border-b">Classified Category</th>
+              <th class="px-6 py-4 text-left font-bold uppercase text-xs text-white tracking-widest border-b">Answer</th>
+              <th class="px-6 py-4 text-left font-bold uppercase text-xs text-white tracking-widest border-b">Frequency</th>
+              <th class="px-6 py-4 text-left font-bold uppercase text-xs text-white tracking-widest border-b">Related Qustions</th>
             </tr>
           </thead>
           <tbody>
@@ -91,8 +93,10 @@
               :key="index"
               class="transition-all duration-200 border-b last:border-0 hover:bg-blue-50 cursor-pointer even:bg-blue-50/50"
             >
-              <td class="px-4 py-2 text-center border text-gray-600">{{ item.questions }}</td>
-              <td class="px-4 py-2 text-center border text-gray-600">{{ item.predicted_category }}</td>
+              <td class="px-4 py-2 text-center border text-gray-600">{{ item.question }}</td>
+              <td class="px-4 py-2 text-center border text-gray-600">{{ item.answer }}</td>
+              <td class="px-4 py-2 text-center border text-gray-600">{{ item.frequency }}</td>
+              <td class="px-4 py-2 text-center border text-gray-600">{{ item.relatedQuestions }}</td>
               <!-- <td class="px-4 py-2 text-center border text-gray-600">
                 <div class="flex justify-center gap-2">
                   <button
@@ -168,7 +172,6 @@
 <script>
 import Chart from 'chart.js/auto'
 import Swal from "sweetalert2"
-import { Axios } from 'axios';
 import api from "../../services/axios.js";
 import ragApi from "../../services/ragAxios.js";
 import axios from 'axios';
@@ -198,22 +201,21 @@ export default {
   },
   methods: {
     async fetchClassifiedData() {
-        try {
-            const res = await ragApi.post("/predict", {});
-            const data = res.data;
-            
-            const questions = data.questions || [];
-            const categories = data.predicted_categories || [];
+      try {
+        const res = await ragApi.post("/predict", {});
+        // const res = await axios.post("http://localhost:8000/predict");
+        const results = res.data.results || [];
 
-            // Combine into one array of objects
-            this.categoryData = questions.map((question, index) => ({
-              questions: question,
-              predicted_category: categories[index],
-              createdAt: new Date().toISOString(),
-              }));
-        } catch (err) {
-          console.error("Failed to fetch classification data:", err);
-        }
+        this.categoryData = results.map(item => ({
+          question: item.question, 
+          answer: item.answer,
+          frequency: item.frequency,
+          relatedQuestions: item.related_questions,
+          createdAt: new Date().toISOString(),
+        }));
+      } catch (err) {
+        console.error("Failed to fetch classification data:", err);
+      }
     },
 
     async fetchQuestionsThisWeek() {
