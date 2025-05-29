@@ -2,20 +2,20 @@
 import axios from 'axios';
 import Swal from 'sweetalert2';
 import model from "../../services/axios.js";
+import ragApi from '@/services/ragAxios.js';
 
 
 export default {
   data() {
     return {
-      tableData: [], // Initialize an empty array to store the API data
+      tableData: [],
       isModalOpen: false,
       newKnowledge: {
-        // bk_id: "",
         file: "",
-        // notes: "",/
-        // created_at: new Date().toISOString(),
-        // created_by: "Kevin", // Will change this to current user logged on later on
       },
+      currentPage: 1,
+      limit: 5,
+      hasMore: true, // Tracks if more pages are available
     };
   },
   mounted() {
@@ -55,7 +55,7 @@ export default {
       console.log(formData)
       
       try {
-            const sendFile = await axios.post('https://88gnifz3jjl69b-8000.proxy.runpod.net/upload-bk', formData, {
+            const sendFile = await ragApi.post(`/upload-bk`, formData, {
               headers: {
                 'Content-Type': 'multipart/form-data'
               }
@@ -68,13 +68,13 @@ export default {
         console.error("Error: ", error);
         Swal.fire("Upload Failed", error.message || "Something went wrong", "error");
       }
-    },
-
-
-    async fetchKnowledgeData() {
+    },    
+    async fetchKnowledgeData(page = 1) {
       try {
-        const { data } = await axios.get(`${import.meta.env.VITE_RAG_API}/get-data/`);
+        const { data } = await ragApi.get(`/get-data?page=${page}&limit=${this.limit}`);
         this.tableData = data.data;
+        this.currentPage = page;
+        this.hasMore = data.has_more;
       } catch (error) {
         console.error("Error fetching data:", error);
       }
@@ -134,6 +134,23 @@ export default {
             </tr>
           </tbody>
         </table>
+          <div class="flex justify-between items-center px-6 mt-4">
+            <button
+              @click="fetchKnowledgeData(currentPage - 1)"
+              :disabled="currentPage === 1"
+              class="bg-gray-300 text-black px-4 py-2 rounded disabled:opacity-50"
+            >
+              Previous
+            </button>
+            <span class="text-gray-600">Page {{ currentPage }}</span>
+            <button
+              @click="fetchKnowledgeData(currentPage + 1)"
+              :disabled="!hasMore"
+              class="bg-gray-800 text-white px-4 py-2 rounded disabled:opacity-50"
+            >
+              Next
+            </button>
+          </div>
       </div>
     </div>
 
