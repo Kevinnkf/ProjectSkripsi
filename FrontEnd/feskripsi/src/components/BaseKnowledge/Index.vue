@@ -49,17 +49,16 @@ export default {
       }
 
       let formData = new FormData();
-      // console.log("this.newKnowledge.file:", this.newKnowledge.file);
-      // console.log("Instanceof File?", this.newKnowledge.file instanceof File);
       formData.append("file", this.newKnowledge.file); // File
       console.log(formData)
       
       try {
-            const sendFile = await ragApi.post(`/upload-bk`, formData, {
+            const sendFile = await ragApi.post(`/upload-bk/`, formData, {
               headers: {
                 'Content-Type': 'multipart/form-data'
               }
             });
+            console.log("ragAPI:", ragApi);
             console.log("Upload success:", sendFile);
             Swal.fire("Success!", "PDF uploaded and processed successfully.", "success");
             this.newKnowledge.file = "";
