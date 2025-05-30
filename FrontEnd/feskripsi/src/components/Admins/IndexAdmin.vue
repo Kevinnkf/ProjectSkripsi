@@ -183,7 +183,7 @@ export default {
     async registerAdmin() {
       try {
         const response = await api.post(
-          "admins/register",
+          "/admins/register",
           this.newAdmin
         );
         console.log("Success:", response.data);
@@ -200,8 +200,8 @@ export default {
     },
     async fetchData() {
       try {
-        // const response = await api.get("/admins");
-        const response = await api.get("http://localhost:5000/api/admins");
+        const response = await api.get("/admins");
+        // const response = await api.get("http://localhost:5000/api/admins");
 
         this.tableData = response.data;
         console.log("Fetched Data:", this.tableData);
