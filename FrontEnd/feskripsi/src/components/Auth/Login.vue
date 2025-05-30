@@ -68,9 +68,8 @@
     methods: {
     async loginUser() {
       try {
-        const response = await api.post(
-          'admins/login',
-          {
+        // const response = await api.post('http://localhost:5000/api/admins/login', {
+        const response = await api.post('admins/login', {
             nippm: parseInt(this.nippm, 10),
             password: this.password
           },

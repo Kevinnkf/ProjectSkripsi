@@ -30,6 +30,62 @@ export async function addFAQ(req, res){
     }
 }
 
+export async function editFAQ(req, res){
+    try {
+        const { id } = req.params;  
+        const {question, answer} = req.body;
+
+        // Find the FAQ 
+        const existingFaq = await faq.findByPk(id);
+
+        if (!existingFaq) {
+            return res.status(404).json({ message: 'FAQ not found' });
+        }
+
+        existingFaq.question = question;
+        existingFaq.answer = answer;
+
+        await existingFaq.save();
+    
+        res.status(201).json({
+          message: 'Updated successfully',
+          admin: existingFaq,
+        });
+    } catch (error) {
+        console.log("Error occured: ", error)
+        res.status(500).json({
+            error: "Failed to update",
+            detail: error.message
+        })
+    }
+}
+
+export async function deleteFAQ(req, res){
+    try {
+        const { id } = req.params;  
+
+        // Find the FAQ 
+        const existingFaq = await faq.findByPk(id);
+
+        if (!existingFaq) {
+            return res.status(404).json({ message: 'FAQ not found' });
+        }
+
+        await existingFaq.destroy();
+    
+        res.status(201).json({  
+          message: 'Deleted successfully',
+          admin: existingFaq,
+        });
+    } catch (error) {
+        console.log("Error occured: ", error)
+        res.status(500).json({
+            error: "Failed to Delete",
+            detail: error.message
+        })
+    }
+}
+
 export async function getFAQ(req, res){
     try {
         const newFAQ = await faq.findAll()
