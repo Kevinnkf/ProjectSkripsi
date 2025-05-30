@@ -344,8 +344,8 @@ export default {
     },
     async fetchFaqData() {
       try {
-        // const response = await api.get("/faq");
-        const response = await axios.get("http://localhost:5000/api/faq");
+        const response = await api.get("/faq");
+        // const response = await axios.get("http://localhost:5000/api/faq");
         this.faqData = response.data;
       } catch (error) {
         console.error("Error fetching FAQ data:", error);
