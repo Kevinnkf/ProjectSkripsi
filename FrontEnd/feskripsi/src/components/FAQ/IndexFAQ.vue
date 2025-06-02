@@ -35,11 +35,12 @@
             <tr
               v-for="(item, index) in faqData"
               :key="index"
+              @click="openDetailModal(item)"
               class="transition-all duration-200 border-b last:border-0 hover:bg-blue-50 cursor-pointer even:bg-blue-50/50"
             >
-              <td class="px-4 py-2 text-center border text-gray-600">{{ item.question }}</td>
-              <td class="px-4 py-2 text-center border text-gray-600">{{ item.answer }}</td>
-              <td class="px-4 py-2 text-center border text-gray-600">{{ formatDate(item.createdAt) }}</td>
+              <td class="px-4 py-2 text-left border text-gray-600">{{ item.question }}</td>
+              <td class="px-4 py-2 text-left border text-gray-600">{{ item.answer }}</td>
+              <td class="px-4 py-2 text-left border text-gray-600">{{ formatDate(item.createdAt) }}</td>
               <!-- <td class="px-4 py-2 text-center border text-gray-600">
                 <div class="flex justify-center gap-2">
                   <button
@@ -93,10 +94,16 @@
               :key="index"
               class="transition-all duration-200 border-b last:border-0 hover:bg-blue-50 cursor-pointer even:bg-blue-50/50"
             >
-              <td class="px-4 py-2 text-center border text-gray-600">{{ item.question }}</td>
+              <td class="px-4 py-2 text-center border text-gray-600">{{ item.matched_faq_question }}</td>
               <td class="px-4 py-2 text-center border text-gray-600">{{ item.answer }}</td>
               <td class="px-4 py-2 text-center border text-gray-600">{{ item.frequency }}</td>
-              <td class="px-4 py-2 text-center border text-gray-600">{{ item.relatedQuestions }}</td>
+              <td class="px-4 py-2 text-left border text-gray-600">
+                <ul class="list-disc list-inside space-y-1 text-sm">
+                  <li v-for="(related, i) in item.relatedQuestions.slice(0,2  )" :key="i">
+                    {{ related }}
+                  </li>
+                </ul>
+              </td>
               <!-- <td class="px-4 py-2 text-center border text-gray-600">
                 <div class="flex justify-center gap-2">
                   <button
@@ -119,50 +126,85 @@
       </div>
     </div>
 
-    <!-- Modal -->
+    <!-- Add FAQ Modal -->
     <transition name="modal-fade">
-      <div
-        v-show="isModalOpen"
-        class="fixed inset-0 bg-gray-600 bg-opacity-50 flex justify-center items-center z-50"
-      >
-        <div class="bg-white p-8 rounded-2xl w-full max-w-lg shadow-lg overflow-y-auto max-h-[90vh]">
-          <h2 class="text-xl font-bold mb-4 text-[#064E3B]">Add New FAQ</h2>
+      <div v-if="isModalOpen" class="fixed inset-0 bg-black/30 flex items-center justify-center z-50">
+        <div class="bg-white p-8 rounded-2xl shadow-2xl max-w-2xl w-full border border-green-200">
+          <div class="flex justify-between items-center mb-4">
+            <h3 class="font-bold text-2xl text-[#064E3B]">Add New FAQ</h3>
+            <button @click="closeModal" class="text-gray-500 hover:text-red-500 text-xl">&times;</button>
+          </div>
+
           <form @submit.prevent="addFaq">
             <div class="mb-4">
-              <label for="question" class="block text-sm font-semibold">Question</label>
+              <label for="question" class="block font-semibold text-[#064E3B] mb-1">Question:</label>
               <input
                 id="question"
                 v-model="newFaq.question"
                 type="text"
                 placeholder="Example: Apa itu HaloPNJ"
-                class="w-full p-3 border border-gray-200 rounded focus:ring-2 focus:ring-green-300"
+                class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-300 "
               />
             </div>
-            <div class="mb-4">
-              <label for="answer" class="block text-sm font-semibold">Answer</label>
+
+            <div class="mb-6">
+              <label for="answer" class="block font-semibold text-[#064E3B] mb-1">Answer:</label>
               <textarea
                 id="answer"
                 v-model="newFaq.answer"
                 placeholder="HaloPNJ adalah aplikasi berbasis AI untuk keperluan layanan akademik dan kemahasiswaan"
-                class="w-full p-3 border border-gray-200 rounded h-32 focus:ring-2 focus:ring-green-300"
+                class="w-full p-3 border border-gray-300 rounded-lg h-32 focus:ring-2 focus:ring-green-300 resize-none"
               ></textarea>
             </div>
+
             <div class="flex justify-end">
               <button
                 type="button"
                 @click="closeModal"
-                class="bg-gray-200 text-black px-4 py-2 rounded mr-2"
+                class="bg-gray-200 text-gray-800 px-4 py-2 rounded mr-2 hover:bg-gray-300"
               >
                 Back
               </button>
               <button
                 type="submit"
-                class="bg-green-800 text-white px-4 py-2 rounded"
+                class="bg-green-800 text-white px-4 py-2 rounded hover:bg-green-700"
               >
                 Save
               </button>
             </div>
           </form>
+        </div>
+      </div>
+    </transition>
+
+    <!-- Edit FAQ Modal -->
+    <transition>
+      <div v-if="showModal" class="fixed inset-0 bg-black/30 flex items-center justify-center z-50">
+        <div class="bg-white p-8 rounded-2xl shadow-2xl max-w-2xl w-full border border-blue-200">
+          <div class="flex justify-between items-center mb-4">
+            <h3 class="font-bold text-2xl text-green-800">Edit or delete FAQ</h3>
+            <button @click="closeDetailModal" class="text-gray-500 hover:text-red-500 text-xl">&times;</button>
+          </div>
+
+          <div class="mb-4">
+            <label class="font-semibold text-green-800 mb-1 block">ID</label>
+            <input v-model="modalChat.id" class="w-full border border-gray-300 rounded px-4 py-2" readonly disabled />
+          </div>
+
+          <div class="mb-4">
+            <label class="font-semibold text-green-800 mb-1 block">Question</label>
+            <input v-model="modalChat.question" class="w-full border border-gray-300 rounded px-4 py-2" />
+          </div>
+
+          <div class="mb-4">
+            <label class="font-semibold text-green-800 mb-1 block">Answer</label>
+            <textarea v-model="modalChat.answer" rows="6" class="w-full border border-gray-300 rounded px-4 py-2 resize-none"></textarea>
+          </div>
+
+          <div class="flex justify-end space-x-2 mt-6">
+            <button @click="deleteFaq" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded">Delete</button>
+            <button @click="editFaq" class="bg-green-800 hover:bg-green-700 text-white px-4 py-2 rounded">Save</button>
+          </div>
         </div>
       </div>
     </transition>
@@ -185,6 +227,8 @@ export default {
       categoryData: [],
       chart: null,
       isModalOpen: false,
+      modalChat: null, 
+      showModal: false,
       newFaq: {
         question: "",
         answer: "",
@@ -209,6 +253,7 @@ export default {
         this.categoryData = results.map(item => ({
           question: item.question, 
           answer: item.answer,
+          matched_faq_question: item.matched_faq_question,
           frequency: item.frequency,
           relatedQuestions: item.related_questions,
           createdAt: new Date().toISOString(),
@@ -300,6 +345,7 @@ export default {
     async fetchFaqData() {
       try {
         const response = await api.get("/faq");
+        // const response = await axios.get("http://localhost:5000/api/faq");
         this.faqData = response.data;
       } catch (error) {
         console.error("Error fetching FAQ data:", error);
@@ -308,6 +354,7 @@ export default {
     async addFaq() {
       try {
         const response = await api.post('/faq/post', this.newFaq)
+        // const response = await api.post('http://localhost:5000/api/faq/post', this.newFaq)
         Swal.fire("Success!", "New FAQ has been added", "success");
         await this.fetchFaqData();
         this.closeModal();
@@ -316,12 +363,62 @@ export default {
         Swal.fire("Adding faq failed", error.message || "Something went wrong", "error");
       }
     },
+    async editFaq() {
+      try {
+        const id = this.modalChat.id; 
+        const payload = {
+          question: this.modalChat.question,
+          answer: this.modalChat.answer,
+        };
+
+        const response = await api.put(`/faq/edit/${id}`, this.newFaq)
+        // const response = await api.put(`http://localhost:5000/api/faq/edit/${id}`, payload )
+        Swal.fire("Success!", "FAQ has been edited", "success");
+        await this.fetchFaqData();
+        this.closeDetailModal();
+        this.newFaq = { question: "", answer: ""};
+      } catch (error) {
+        Swal.fire("Editing faq failed", error.message || "Something went wrong", "error");
+      }
+    },
+    async deleteFaq() {
+      const result = await Swal.fire({
+        title: "Are you sure?",
+        text: "You won't be able to undo this!",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#D33",
+        cancelButtonColor: "#064E3B",
+        confirmButtonText: "Yes, delete it!",
+      });
+
+      if (result.isConfirmed) {
+        try {
+          const id = this.modalChat.id;
+          const response = await api.delete(`/faq/delete/${id}`);
+          // const response = await api.delete(`http://localhost:5000/api/faq/delete/${id}`);
+          Swal.fire("Deleted!", "FAQ has been deleted.", "success");
+          this.closeDetailModal();
+          await this.fetchFaqData();
+          this.newFaq = { question: "", answer: "" };
+        } catch (error) {
+          Swal.fire("Deleting faq failed", error.message || "Something went wrong", "error");
+        }
+      }
+    },
     formatDate(dateString) {
       const date = new Date(dateString);
       const year = date.getFullYear();
       const month = String(date.getMonth() + 1).padStart(2, '0');
       const day = String(date.getDate()).padStart(2, '0');
       return `${year}-${month}-${day}`;
+    },
+    openDetailModal(item) {
+      this.modalChat = item;
+      this.showModal = true;
+    },
+    closeDetailModal() {
+      this.showModal = false;
     },
     openModal() {
       this.isModalOpen = true;

@@ -49,17 +49,16 @@ export default {
       }
 
       let formData = new FormData();
-      // console.log("this.newKnowledge.file:", this.newKnowledge.file);
-      // console.log("Instanceof File?", this.newKnowledge.file instanceof File);
       formData.append("file", this.newKnowledge.file); // File
       console.log(formData)
       
       try {
-            const sendFile = await ragApi.post(`/upload-bk`, formData, {
+            const sendFile = await ragApi.post(`/upload-bk/`, formData, {
               headers: {
                 'Content-Type': 'multipart/form-data'
               }
             });
+            console.log("ragAPI:", ragApi);
             console.log("Upload success:", sendFile);
             Swal.fire("Success!", "PDF uploaded and processed successfully.", "success");
             this.newKnowledge.file = "";
@@ -79,6 +78,25 @@ export default {
         console.error("Error fetching data:", error);
       }
     },
+
+    async searchKnowledge(filename, page = 1) {
+      try {
+        // const { data } = await ragApi.get(`/search-file`, {
+        const { data } = await axios.get(`http://localhost:8000/search-file`, {
+          params: {
+            filename: filename,
+            page: page,
+            limit: 10
+          }
+        });
+
+        this.tableData = data.data;
+        this.currentPage = page;
+        this.hasMore = data.has_more;
+      } catch (error) {
+        console.error("Error searching data", error);
+      }
+    }
   },
 };
 </script>
@@ -93,16 +111,21 @@ export default {
 
     <!-- List Header & Action -->
     <div class="flex items-center justify-between mb-4 px-6">
-      <h2 class="text-xl font-semibold text-black mb-2 drop-shadow">List of SOP</h2>
-      <button
-        @click="openModal"
-        class="inline-flex items-center px-4 py-2 bg-green-100 text-[#064E3B] hover:bg-green-200 border border-bg-[#064E3B] rounded-lg shadow transition font-semibold"
-      >
-        <svg class="w-5 h-5 mr-2 text-[#064E3B]" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/>
-        </svg>
-        Add Knowledge
-      </button>
+      <div>
+        <h2 class="text-xl font-semibold text-black mb-2 drop-shadow">List of SOP</h2>
+      </div>
+      <div>
+        <button
+          @click="openModal"
+          class="inline-flex items-center mx-2 px-4 py-2 bg-green-100 text-[#064E3B] hover:bg-green-200 border border-bg-[#064E3B] rounded-lg shadow transition font-semibold"
+        >
+          <svg class="w-5 h-5 mr-2 text-[#064E3B]" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/>
+          </svg>
+          Add Knowledge
+        </button>
+            <input type="text" v-model="searchKeyword" @input="searchKnowledge(searchKeyword)" placeholder="Search by filename..." class="w-full md:w-64 mx-2 px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-[#064E3B] focus:border-transparent transition"/>
+      </div>
     </div>
 
     <!-- Data Table -->

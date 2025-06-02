@@ -23,12 +23,8 @@ app.get('/', (req, res) => {
 });
 
 app.use(cors({
-<<<<<<< HEAD
-  origin:      process.env.FRONTEND_URL || 'https://halo-pnj.vercel.app' || 'http://localhost:5173',
-=======
   // origin:      process.env.FRONTEND_URL  || 'https://halo-pnj.vercel.app',
   origin: 'http://localhost:5173',
->>>>>>> 1999a16cc2ec9c9c0bced0d539daa4f3d1a8f9aa
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE'],
   allowedHeaders: ['Authorization', 'Content-Type']

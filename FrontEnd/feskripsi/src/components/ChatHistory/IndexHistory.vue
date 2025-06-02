@@ -59,7 +59,7 @@
   </div>
 </div>
 
-    <div class="overflow-x-auto px-6 pb-6">
+  <div class="overflow-x-auto px-6 pb-6">
   <div class="shadow-lg rounded-2xl border border-gray-100 bg-white">
     <table class="min-w-full rounded-2xl overflow-hidden">
       <thead class="bg-[#064E3B]">
