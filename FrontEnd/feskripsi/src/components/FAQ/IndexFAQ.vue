@@ -371,7 +371,7 @@ export default {
           answer: this.modalChat.answer,
         };
 
-        const response = await api.put(`/faq/edit/${id}`, this.newFaq)
+        const response = await api.put(`/faq/edit/${id}`, payload)
         // const response = await api.put(`http://localhost:5000/api/faq/edit/${id}`, payload )
         Swal.fire("Success!", "FAQ has been edited", "success");
         await this.fetchFaqData();
