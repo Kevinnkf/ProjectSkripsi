@@ -106,6 +106,7 @@
 <script setup>
 import { ref, onMounted } from 'vue';
 import { useUserStore } from '../Stores/UserStore.vue'; // Adjust path as needed
+import Swal from 'sweetalert2';
 import api from "../../services/axios.js";
 
 const userStore = useUserStore();
@@ -137,7 +138,8 @@ const closeModal = () => {
 
 const resetPassword = async () => {
   try {
-    const response = await api.post('/admins/reset-password', updateAdmin.value);
+    // const response = await api.post('/admins/reset-password', updateAdmin.value);
+    const response = await api.post('http://localhost:5000/api/admins/reset-password', updateAdmin.value);
 
     // const response = await api.get('reset-password', {
       // method: 'POST',
@@ -145,19 +147,17 @@ const resetPassword = async () => {
       // body: JSON.stringify(updateAdmin.value),
     // });
 
-    const result = await response.json();
-
-    if (!response.ok) throw new Error(result.error || 'Unknown error');
-
-    alert(result.message || 'Password updated successfully');
     closeModal();
-  } catch (err) {
-    alert(err.message);
+    
+    Swal.fire("Success!", "Successfully changed password.", "success")
+    
+  } catch (error) {
+    Swal.fire("Error", error.response?.data?.message || "Please enter the correct password", "error");
   }
 };
 
 onMounted(() => {
-  // If needed, you can also fetch more profile info here
+  
 });
 </script>
 
