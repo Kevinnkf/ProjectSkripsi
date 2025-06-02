@@ -1,7 +1,6 @@
 import os
 os.environ["HF_HOME"] = os.getenv("HF_HOME", "/workspace/models")
 
-# app/rag.py
 import torch
 from transformers import (
     AutoTokenizer,
@@ -14,14 +13,20 @@ from qdrant_client.models import Distance, VectorParams
 
 from app.config import QDRANT_URL, QDRANT_API_KEY, COLLECTION_NAME
 
-# 4-bit quantization config 
+# ── set constant untuk fallback dan threshold
+FALLBACK = (
+    "Maaf pertanyaan Anda tidak ada di pencarian dokumen kami, "
+    "silakan hubungi akademik@pnj.ac.id untuk pertanyaan lebih lanjut. Terima kasih."
+)
+SIMILARITY_THRESHOLD = 0.8
+
+# ── load model & tokenizer (4-bit Qwen2.5-3B)
 bnb_config = BitsAndBytesConfig(
     load_in_4bit=True,
     bnb_4bit_quant_type="nf4",
     bnb_4bit_compute_dtype=torch.float16
 )
 
-# load Qwen2.5-3B with quantization 
 tokenizer = AutoTokenizer.from_pretrained(
     "unsloth/Qwen2.5-3B",
     trust_remote_code=True
@@ -33,29 +38,44 @@ model = AutoModelForCausalLM.from_pretrained(
     trust_remote_code=True
 )
 
-# embedding model & Qdrant client 
-embed_model   = SentenceTransformer("intfloat/multilingual-e5-small")
+# ── embedding model & qdrant
+embed_model   = SentenceTransformer("intfloat/multilingual-e5-large")
 qdrant_client = QdrantClient(url=QDRANT_URL, api_key=QDRANT_API_KEY)
 
-# collection exists
+# check qdrant
 existing = [c.name for c in qdrant_client.get_collections().collections]
 if COLLECTION_NAME not in existing:
     qdrant_client.create_collection(
         collection_name=COLLECTION_NAME,
-        vectors_config=VectorParams(size=384, distance=Distance.COSINE)
+        vectors_config=VectorParams(size=1024, distance=Distance.COSINE)
     )
 
-def retrieve_context(query: str, top_k: int = 3) -> str:
-    query_vector = embed_model.encode([query])[0]
+# ── retrieve function
+def retrieve_context_with_score(query: str, top_k: int = 3):
+    """
+    Mengembalikan:
+      - hits: daftar ScoredPoint (masing-masing punya .payload dan .score)
+      - best_score: skor kemiripan tertinggi (0.0 jika tidak ada hits)
+    """
+    query_vector = embed_model.encode([query])[0].tolist()
+
+    # panggil search hanya dengan with_payload=True
     hits = qdrant_client.search(
         collection_name=COLLECTION_NAME,
-        query_vector=query_vector.tolist(),
+        query_vector=query_vector,
         limit=top_k,
+        with_payload=True
     )
-    return "\n".join(hit.payload.get("text", "") for hit in hits)
+    if not hits:
+        return [], 0.0
 
+    # Dapatkan skor tertinggi dari hit pertama
+    best_score = hits[0].score if hasattr(hits[0], "score") else 0.0
+    return hits, best_score
+
+# ── generation function
 def generate_qwen_response(prompt: str) -> str:
-    device = model.device            # uses the GPU if available
+    device = model.device
     inputs = tokenizer(prompt, return_tensors="pt").to(device)
     output = model.generate(
         **inputs,
@@ -67,6 +87,7 @@ def generate_qwen_response(prompt: str) -> str:
     )
     return tokenizer.decode(output[0], skip_special_tokens=True)
 
+# ── prompt function
 def build_prompt(context: str, question: str) -> str:
     return f"""Ini adalah chatbot layanan akademik Politeknik Negeri Jakarta. Berikan jawaban yang ringkas, akurat dan jelas dalam Bahasa Indonesia menggunakan informasi yang tersedia.
 
@@ -83,37 +104,74 @@ Jawaban harus:
 
 Jawaban:"""
 
+# ── answer function dengan mekanisme fallback
 def answer_query(question: str) -> str:
-    context = retrieve_context(question)
+    """
+    1. Lakukan retrieve_context_with_score untuk mendapatkan hits & best_score.
+    2. Jika best_score < SIMILARITY_THRESHOLD, langsung kembalikan FALLBACK.
+    3. Jika best_score ≥ SIMILARITY_THRESHOLD, satukan teks dari hits (payload),
+       lalu generate jawaban dengan model.
+    """
+    hits, best_score = retrieve_context_with_score(question, top_k=3)
+
+    # tidak ada dokumen relevan atau skornya di bawah threshold → fallback
+    if best_score is None or best_score < SIMILARITY_THRESHOLD or len(hits) == 0:
+        return FALLBACK
+
+    # gabungkan konten teks dari payload tiap hit
+    context_texts = []
+    for hit in hits:
+        payload = hit.payload or {}
+        text_block = payload.get("text", "")
+        if text_block:
+            context_texts.append(text_block)
+
+    context = "\n".join(context_texts)
     prompt = build_prompt(context, question)
     full_response = generate_qwen_response(prompt)
     return full_response.split("Jawaban:")[-1].strip()
 
+
 # import os
+# os.environ["HF_HOME"] = os.getenv("HF_HOME", "/workspace/models")
+
+# # app/rag.py
 # import torch
-# from transformers import AutoTokenizer, AutoModelForCausalLM
+# from transformers import (
+#     AutoTokenizer,
+#     AutoModelForCausalLM,
+#     BitsAndBytesConfig
+# )
 # from sentence_transformers import SentenceTransformer
 # from qdrant_client import QdrantClient
 # from qdrant_client.models import Distance, VectorParams
 
 # from app.config import QDRANT_URL, QDRANT_API_KEY, COLLECTION_NAME
 
-# # Load Qwen2.5-3B —
-# device = "cuda" if torch.cuda.is_available() else "cpu"
+# # 4-bit quantization config 
+# bnb_config = BitsAndBytesConfig(
+#     load_in_4bit=True,
+#     bnb_4bit_quant_type="nf4",
+#     bnb_4bit_compute_dtype=torch.float16
+# )
+
+# # load Qwen2.5-3B with quantization 
 # tokenizer = AutoTokenizer.from_pretrained(
 #     "unsloth/Qwen2.5-3B",
 #     trust_remote_code=True
 # )
 # model = AutoModelForCausalLM.from_pretrained(
 #     "unsloth/Qwen2.5-3B",
+#     quantization_config=bnb_config,
+#     device_map="auto",
 #     trust_remote_code=True
-# ).to(device)
+# )
 
-# # Load your embedding model & Qdrant client —
+# # embedding model & Qdrant client 
 # embed_model   = SentenceTransformer("intfloat/multilingual-e5-small")
 # qdrant_client = QdrantClient(url=QDRANT_URL, api_key=QDRANT_API_KEY)
 
-# # Ensure the collection exists
+# # collection exists
 # existing = [c.name for c in qdrant_client.get_collections().collections]
 # if COLLECTION_NAME not in existing:
 #     qdrant_client.create_collection(
@@ -123,26 +181,24 @@ def answer_query(question: str) -> str:
 
 # def retrieve_context(query: str, top_k: int = 3) -> str:
 #     query_vector = embed_model.encode([query])[0]
-#     search_result = qdrant_client.search(
+#     hits = qdrant_client.search(
 #         collection_name=COLLECTION_NAME,
 #         query_vector=query_vector.tolist(),
 #         limit=top_k,
 #     )
-#     return "\n".join(hit.payload.get("text", "") for hit in search_result)
+#     return "\n".join(hit.payload.get("text", "") for hit in hits)
 
 # def generate_qwen_response(prompt: str) -> str:
-#     device = "cuda" if torch.cuda.is_available() else "cpu"
+#     device = model.device            # uses the GPU if available
 #     inputs = tokenizer(prompt, return_tensors="pt").to(device)
 #     output = model.generate(
-#         **inputs, 
+#         **inputs,
 #         max_new_tokens=256,
-#         do_sample=False,            # <- turn off sampling entirely
-#         # temperature=0.1,            # <- no randomness
-#         num_beams=1,                # 1 = pure greedy; >1 = beam search
-#         # early_stopping=True,
+#         do_sample=False,
+#         num_beams=1,
 #         eos_token_id=tokenizer.eos_token_id,
 #         pad_token_id=tokenizer.eos_token_id
-#         )
+#     )
 #     return tokenizer.decode(output[0], skip_special_tokens=True)
 
 # def build_prompt(context: str, question: str) -> str:
@@ -165,9 +221,7 @@ def answer_query(question: str) -> str:
 #     context = retrieve_context(question)
 #     prompt = build_prompt(context, question)
 #     full_response = generate_qwen_response(prompt)
-#     # Extract the generated answer after "Jawaban:"
-#     answer = full_response.split("Jawaban:")[-1].strip()
-#     return answer
+#     return full_response.split("Jawaban:")[-1].strip()
 
 
 
