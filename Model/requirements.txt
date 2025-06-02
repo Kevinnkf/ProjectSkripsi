@@ -15,6 +15,7 @@ pandas
 numpy
 scikit-learn
 joblib
+# pickle
 openpyxl
 PyMuPDF
 qdrant-client

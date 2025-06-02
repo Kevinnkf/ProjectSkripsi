@@ -20,7 +20,7 @@ from app.config import QDRANT_URL, QDRANT_API_KEY, COLLECTION_NAME
 
 router = APIRouter()
 
-VECTOR_DIM = 384
+VECTOR_DIM = 1024
 CHUNK_SIZE = 1000
 CHUNK_OVERLAP = 200
 
@@ -28,7 +28,7 @@ client = QdrantClient(url=QDRANT_URL, api_key=QDRANT_API_KEY)
 
 BASE = Path(__file__).parent  
 vectorizer = joblib.load(BASE / 'tfidf_vectorizer.pkl')
-model      = joblib.load(BASE / 'faq_classifier_model.pkl')
+model_data_cluster = joblib.load(BASE / 'faq_cluster_model.pkl')
 
 # vectorizer = joblib.load('./tfidf_vectorizer.pkl')
 # model = joblib.load('./faq_classifier_model.pkl')
@@ -39,11 +39,11 @@ if not client.collection_exists(COLLECTION_NAME):
         vectors_config=VectorParams(size=VECTOR_DIM, distance=Distance.COSINE),
     )
 
-embed_model = SentenceTransformer('intfloat/multilingual-e5-small')
+embed_model = SentenceTransformer('intfloat/multilingual-e5-large')
 
 # Load model once on startup
-with open("faq_cluster_model.pkl", "rb") as f:
-    model_data_cluster = pickle.load(f)
+# with open("faq_cluster_model.pkl", "rb") as f:
+#     model_data_cluster = pickle.load(f)
 
 kmeans_model = model_data_cluster["kmeans"]
 sentence_model = SentenceTransformer(model_data_cluster["sentence_model_name"])
