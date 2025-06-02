@@ -138,8 +138,8 @@ const closeModal = () => {
 
 const resetPassword = async () => {
   try {
-    // const response = await api.post('/admins/reset-password', updateAdmin.value);
-    const response = await api.post('http://localhost:5000/api/admins/reset-password', updateAdmin.value);
+    const response = await api.post('/admins/reset-password', updateAdmin.value);
+    // const response = await api.post('http://localhost:5000/api/admins/reset-password', updateAdmin.value);
 
     // const response = await api.get('reset-password', {
       // method: 'POST',
