@@ -357,7 +357,7 @@ export default {
         // const response = await api.post('http://localhost:5000/api/faq/post', this.newFaq)
         Swal.fire("Success!", "New FAQ has been added", "success");
         await this.fetchFaqData();
-        this.closeMOdal();
+        this.closeModal();
         this.newFaq = { question: "", answer: ""};
       } catch (error) {
         Swal.fire("Adding faq failed", error.message || "Something went wrong", "error");
@@ -371,7 +371,7 @@ export default {
           answer: this.modalChat.answer,
         };
 
-        const response = await api.put('/faq/edit/${id}', this.newFaq)
+        const response = await api.put(`/faq/edit/${id}`, this.newFaq)
         // const response = await api.put(`http://localhost:5000/api/faq/edit/${id}`, payload )
         Swal.fire("Success!", "FAQ has been edited", "success");
         await this.fetchFaqData();
