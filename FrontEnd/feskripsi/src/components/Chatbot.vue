@@ -10,7 +10,7 @@ const chatHistory = ref([]);
 onMounted(() => {
   chatHistory.value.push({
     initial: true,
-    bot_response: null, // will render custom HTML
+    bot_response: null, // Custom HTML for greeting
     chat_id: null,
     feedback: null,
   });
@@ -26,22 +26,22 @@ const scrollToBottom = () => {
   });
 };
 
-const sendMessage = async () => {
-  if (!message.value.trim()) return;
+const sendMessage = async (msg = null) => {
+  const content = (msg !== null) ? msg : message.value.trim();
+  if (!content) return;
 
   chatHistory.value.push({
-    user_message: message.value.trim(),
+    user_message: content,
     bot_response: "",
     chat_id: null,
     feedback: null,
   });
   scrollToBottom();
 
-  const userMessage = { message: message.value.trim() };
   message.value = "";
 
   try {
-    const response = await api.post("/chats/post", userMessage);
+    const response = await api.post("/chats/post", { message: content });
     const chat_id = response.data.chat_id || response.data.chatId;
     const lastChat = chatHistory.value[chatHistory.value.length - 1];
     lastChat.bot_response = response.data.botReply;
@@ -79,11 +79,10 @@ const sendFeedback = async (chat, type) => {
 
 const hasFeedback = (chat, type) => chat.feedback === type;
 
+// Example query handler: calls sendMessage with the example
 const sendExampleQuery = async (example) => {
-  message.value = example;
-  await sendMessage();
+  await sendMessage(example);
 };
-
 </script>
 
 <template>
@@ -94,12 +93,8 @@ const sendExampleQuery = async (example) => {
     <!-- Chat Body -->
     <div class="flex-1 overflow-y-auto px-4 py-6 chat-box pt-20">
       <div class="max-w-3xl mx-auto space-y-6">
-        <div
-          v-for="(chat, idx) in chatHistory"
-          :key="idx"
-          class="flex items-start space-x-4"
-        >
-          <!-- Initial Greeting -->
+        <div v-for="(chat, idx) in chatHistory" :key="idx">
+          <!-- Initial Greeting Block -->
           <div v-if="chat.initial" class="w-full flex">
             <div class="flex items-start space-x-3">
               <div class="flex-shrink-0">
@@ -115,32 +110,32 @@ const sendExampleQuery = async (example) => {
                 <p class="leading-relaxed mb-3">
                   Halo, selamat datang di <b>HaloPNJ</b>!<br />
                   <span>
-                  Silakan tanyakan informasi seputar prosedur kampus,
-                  administrasi, atau hal akademik lainnya. Kami siap membantu kapan saja!
+                    Silakan tanyakan informasi seputar prosedur kampus,
+                    administrasi, atau hal akademik lainnya. Kami siap membantu kapan saja!
                   </span>
                 </p>
                 <div class="flex flex-wrap gap-2">
                   <button
                     class="bg-white border border-green-600 text-green-700 px-4 py-2 rounded-lg text-sm hover:bg-green-50 transition"
-                    @click="() => sendExampleQuery('Bagaimana prosedur pembuatan surat keterangan aktif kuliah?')"
+                    @click="sendExampleQuery('Bagaimana prosedur pembuatan surat keterangan aktif kuliah?')"
                   >
                     Bagaimana prosedur pembuatan surat keterangan aktif kuliah?
                   </button>
                   <button
                     class="bg-white border border-green-600 text-green-700 px-4 py-2 rounded-lg text-sm hover:bg-green-50 transition"
-                    @click="() => sendExampleQuery('Apa saja syarat pengajuan beasiswa di PNJ?')"
+                    @click="sendExampleQuery('Apa saja syarat pengajuan beasiswa di PNJ?')"
                   >
                     Apa saja syarat pengajuan beasiswa di PNJ?
                   </button>
                   <button
                     class="bg-white border border-green-600 text-green-700 px-4 py-2 rounded-lg text-sm hover:bg-green-50 transition"
-                    @click="() => sendExampleQuery('Bagaimana cara legalisasi ijazah dan transkrip?')"
+                    @click="sendExampleQuery('Bagaimana cara legalisasi ijazah dan transkrip?')"
                   >
                     Bagaimana cara legalisasi ijazah dan transkrip?
                   </button>
                   <button
                     class="bg-white border border-green-600 text-green-700 px-4 py-2 rounded-lg text-sm hover:bg-green-50 transition"
-                    @click="() => sendExampleQuery('Bagaimana mengurus perubahan data mahasiswa?')"
+                    @click="sendExampleQuery('Bagaimana mengurus perubahan data mahasiswa?')"
                   >
                     Bagaimana mengurus perubahan data mahasiswa?
                   </button>
@@ -152,23 +147,22 @@ const sendExampleQuery = async (example) => {
             </div>
           </div>
 
-
           <!-- User Message -->
           <div v-else-if="chat.user_message" class="w-full flex justify-end">
-            <div class="flex items-end space-x-3">
+            <div class="flex items-end space-x-3 justify-end">
               <div
                 class="bg-white border border-green-300 rounded-2xl px-4 py-2 shadow max-w-[70%]"
               >
                 <p class="break-words text-gray-700">{{ chat.user_message }}</p>
               </div>
               <div class="flex-shrink-0">
-                <div class="h-10 w-10 bg-green-500 rounded-full"></div>
+                <div class="h-10 w-10 bg-green-500 rounded-full flex items-center justify-center text-white font-bold">U</div>
               </div>
             </div>
           </div>
 
           <!-- Bot Response -->
-          <div v-else class="w-full flex">
+          <div v-else-if="chat.bot_response" class="w-full flex">
             <div class="flex items-start space-x-3">
               <div class="flex-shrink-0">
                 <div
@@ -266,12 +260,7 @@ const sendExampleQuery = async (example) => {
 }
 
 @keyframes bounce {
-  0%,
-  100% {
-    transform: translateY(0);
-  }
-  50% {
-    transform: translateY(-4px);
-  }
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-4px); }
 }
 </style>
