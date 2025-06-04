@@ -26,23 +26,22 @@ const scrollToBottom = () => {
   });
 };
 
-const sendMessage = async () => {
-  if (!message.value.trim()) return;
+const sendMessage = async (msg = null) => {
+  const content = (msg !== null) ? msg : message.value.trim();
+  if (!content) return;
 
-  // Add user message
   chatHistory.value.push({
-    user_message: message.value.trim(),
+    user_message: content,
     bot_response: "",
     chat_id: null,
     feedback: null,
   });
   scrollToBottom();
 
-  const userMessage = { message: message.value.trim() };
   message.value = "";
 
   try {
-    const response = await api.post("/chats/post", userMessage);
+    const response = await api.post("/chats/post", { message: content });
     const chat_id = response.data.chat_id || response.data.chatId;
     const lastChat = chatHistory.value[chatHistory.value.length - 1];
     lastChat.bot_response = response.data.botReply;
@@ -80,10 +79,9 @@ const sendFeedback = async (chat, type) => {
 
 const hasFeedback = (chat, type) => chat.feedback === type;
 
-// Example query handler: makes the button click act as a user message
+// Example query handler: calls sendMessage with the example
 const sendExampleQuery = async (example) => {
-  message.value = example;
-  await sendMessage();
+  await sendMessage(example);
 };
 </script>
 
