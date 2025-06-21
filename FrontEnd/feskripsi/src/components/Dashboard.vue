@@ -139,6 +139,7 @@ export default {
   methods: {
     async fetchQuestionsThisWeek() {
       try {
+        // const res = await api.get('http://localhost:5000/api/chats/count-this-week');
         const res = await api.get('chats/count-this-week');
         const data = res.data;
         this.questionsThisWeek = data.count || 0;
@@ -148,7 +149,6 @@ export default {
       }
     },
     getLast7DaysLabelsAndDates() {
-      // Returns { labels: ['Sun',...], days: ['2024-07-04', ...] }
       const labels = [];
       const days = [];
       const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
@@ -162,26 +162,44 @@ export default {
       return { labels, days };
     },
     countMessagesPerDay(data, days) {
-      return days.map(day =>
-        data.filter(chat => {
-          const created = chat.created_at || chat.createdAt || "";
-          return typeof created === "string" && created.startsWith(day);
-        }).length
-      );
+      return days.map(day => {
+        const count = data.filter(chat => {
+          const created = chat.created_at;
+          if (!created) return false;
+
+          const date = new Date(created);
+          const localDate = date.getFullYear() + '-' +
+            String(date.getMonth() + 1).padStart(2, '0') + '-' +
+            String(date.getDate()).padStart(2, '0');
+
+          // 🔍 Debug log
+          console.log({
+            targetDay: day,
+            createdRaw: created,
+            parsedLocalDate: localDate
+          });
+
+          return localDate === day;
+        }).length;
+
+        console.log(`Count for ${day}: ${count}`);
+        return count;
+      });
     },
+
     async fetchChatData() {
       try {
         // const response = await api.get('http://localhost:5000/api/chats');
         const response = await api.get('chats');
-        const data = response.data;
-        const chatData = data.chats || [];
+        const chatData = response.data || [];
         this.chatData = chatData;
 
         const { labels, days } = this.getLast7DaysLabelsAndDates();
         this.last7DaysLabels = labels;
         this.last7DaysCounts = this.countMessagesPerDay(chatData, days);
-
-        console.log("chatData", response)
+        console.log("Labels:", this.last7DaysLabels);
+        console.log("Counts:", this.last7DaysCounts);
+        console.log("chatData", chatData)
 
         // Only render if there is at least one value > 0
         if (this.last7DaysCounts.some(cnt => cnt > 0)) {

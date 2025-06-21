@@ -262,15 +262,6 @@ export default {
         console.error("Failed to fetch classification data:", err);
       }
     },
-
-    async fetchQuestionsThisWeek() {
-      try {
-        const res = await api.get('/chats/count-this-week');
-        this.questionsThisWeek = res.data.count || 0;
-      } catch (err) {
-        console.error("Failed to fetch questions count this week:", err);
-      }
-    },
     getLast7DaysLabelsAndDates() {
       // Returns { labels: ['Sun',...], days: ['2024-07-04', ...] }
       const labels = [];
@@ -292,26 +283,6 @@ export default {
           return typeof created === "string" && created.startsWith(day);
         }).length
       );
-    },
-    async fetchChatData() {
-      try {
-        // const response = await api.get('http://localhost:5000/api/chats');
-        const response = await api.get('/chats');
-        const data = await response.json();
-        const chatData = data.chats || [];
-        this.chatData = chatData;
-
-        const { labels, days } = this.getLast7DaysLabelsAndDates();
-        this.last7DaysLabels = labels;
-        this.last7DaysCounts = this.countMessagesPerDay(chatData, days);
-
-        // Only render if there is at least one value > 0
-        if (this.last7DaysCounts.some(cnt => cnt > 0)) {
-          this.$nextTick(() => this.renderChart());
-        }
-      } catch (error) {
-        console.error('Error fetching chat data:', error);
-      }
     },
     renderChart() {
       const ctx = document.getElementById('myChart');
