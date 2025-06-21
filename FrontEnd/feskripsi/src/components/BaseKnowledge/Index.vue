@@ -81,8 +81,8 @@ export default {
 
     async searchKnowledge(filename, page = 1) {
       try {
-        // const { data } = await ragApi.get(`/search-file`, {
-        const { data } = await axios.get(`http://localhost:8000/search-file`, {
+        const { data } = await ragApi.get(`/search-file`, {
+        // const { data } = await axios.get(`http://localhost:8000/search-file`, {
           params: {
             filename: filename,
             page: page,

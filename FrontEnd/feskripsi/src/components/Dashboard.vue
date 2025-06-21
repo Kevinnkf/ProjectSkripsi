@@ -14,14 +14,14 @@
         <span class="text-sm text-gray-400">This week</span>
       </div>
       <div class="flex flex-col justify-center items-start p-6 bg-white border border-gray-100 rounded-2xl shadow hover:shadow-md transition min-h-[120px]">
-        <span class="text-gray-500 text-xs mb-1">Users per Day</span>
-        <span class="text-3xl font-extrabold text-[#064E3B] mb-2">{{ 30 }}</span>
-        <span class="text-sm text-gray-400">Average</span>
+        <span class="text-gray-500 text-xs mb-1">Users Accessed</span>
+        <span class="text-3xl font-extrabold text-[#064E3B] mb-2">{{ UsersPerDay }}</span>
+        <span class="text-sm text-gray-400">This week</span>
       </div>
       <div class="flex flex-col justify-center items-start p-6 bg-white border border-gray-100 rounded-2xl shadow hover:shadow-md transition min-h-[120px]">
         <span class="text-gray-500 text-xs mb-1">Base Knowledge</span>
-        <span class="text-3xl font-extrabold text-[#064E3B] mb-2">{{ 12 }}</span>
-        <span class="text-sm text-gray-400">Documents</span>
+        <span class="text-3xl font-extrabold text-[#064E3B] mb-2">{{ totalDataCount }}</span>
+        <span class="text-sm text-gray-400">Total Chunks Uploaded</span>
       </div>
     </div>
 
@@ -32,7 +32,7 @@
           <h3 class="text-lg font-semibold">There are no data for now.</h3>
       </div>
       <div v-else>
-        <canvas id="myChart" width="400" height="120"></canvas>
+        <canvas id="myChart" width="800" height="120"></canvas>
       </div>
     </div>
 
@@ -114,13 +114,19 @@
 import Chart from 'chart.js/auto'
 import Swal from "sweetalert2"
 import api from "../services/axios.js";
+import ragApi from '@/services/ragAxios.js';
 
 export default {
   data() {
     return {
+      currentPage: 1,
+      hasMore: false,
+      limit: 10,
+      totalDataCount: 0,
       questionsThisWeek: 0,
       chatData: [],
       faqData: [],
+      bkData: [],
       chart: null,
       isModalOpen: false,
       newFaq: {
@@ -129,12 +135,14 @@ export default {
       },
       last7DaysLabels: [],
       last7DaysCounts: [],
+      UsersPerDay: []
     }
   },
   mounted() {
     this.fetchQuestionsThisWeek();
     this.fetchChatData();
     this.fetchFaqData();
+    this.fetchKnowledgeData()
   },
   methods: {
     async fetchQuestionsThisWeek() {
@@ -143,9 +151,41 @@ export default {
         const res = await api.get('chats/count-this-week');
         const data = res.data;
         this.questionsThisWeek = data.count || 0;
-        console.log(res)
+        console.log("questionsThisWeek", res)
       } catch (err) {
         console.error("Failed to fetch questions count this week:", err);
+      }
+    },
+    countUniqueUsersPerDay(data, days) {
+        const ips = new Set(); 
+
+        data.forEach(chat => {
+          const created = chat.created_at || chat.createdAt;
+          if (!created) return;
+
+          const date = new Date(created);
+          const localDate = date.getFullYear() + '-' +
+            String(date.getMonth() + 1).padStart(2, '0') + '-' +
+            String(date.getDate()).padStart(2, '0');
+
+          if (days.includes(localDate) && chat.ip_address) {
+            ips.add(chat.ip_address);
+          }
+        });
+        return ips.size;
+      ;
+    },
+    async fetchKnowledgeData(page = 1) {
+      try {
+        const { data } = await ragApi.get(`http://localhost:8000/get-data?page=${page}&limit=${this.limit}`);
+        // const { data } = await ragApi.get(`/get-data?page=${page}&limit=${this.limit}`);
+        this.bkData = data.data;
+        this.totalDataCount = data.total;
+        this.currentPage = page;
+        this.hasMore = data.has_more;
+        // console.log(this.totalDataCount)
+      } catch (error) {
+        console.error("Error fetching data:", error);
       }
     },
     getLast7DaysLabelsAndDates() {
@@ -171,18 +211,8 @@ export default {
           const localDate = date.getFullYear() + '-' +
             String(date.getMonth() + 1).padStart(2, '0') + '-' +
             String(date.getDate()).padStart(2, '0');
-
-          // 🔍 Debug log
-          console.log({
-            targetDay: day,
-            createdRaw: created,
-            parsedLocalDate: localDate
-          });
-
           return localDate === day;
         }).length;
-
-        console.log(`Count for ${day}: ${count}`);
         return count;
       });
     },
@@ -197,9 +227,11 @@ export default {
         const { labels, days } = this.getLast7DaysLabelsAndDates();
         this.last7DaysLabels = labels;
         this.last7DaysCounts = this.countMessagesPerDay(chatData, days);
-        console.log("Labels:", this.last7DaysLabels);
-        console.log("Counts:", this.last7DaysCounts);
-        console.log("chatData", chatData)
+        this.UsersPerDay = this.countUniqueUsersPerDay(chatData, days);
+        console.log(this.UsersPerDay)
+        // console.log("Labels:", this.last7DaysLabels);
+        // console.log("Counts:", this.last7DaysCounts);
+        // console.log("chatData", chatData)
 
         // Only render if there is at least one value > 0
         if (this.last7DaysCounts.some(cnt => cnt > 0)) {
