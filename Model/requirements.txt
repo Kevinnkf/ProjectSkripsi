@@ -14,7 +14,11 @@ tqdm
 pandas
 numpy
 scikit-learn
+matplotlib
+seaborn
 joblib
+umap-learn
+hdbscan
 # pickle
 openpyxl
 PyMuPDF
