@@ -96,7 +96,10 @@ export default {
       } catch (error) {
         console.error("Error searching data", error);
       }
-    }
+    },
+    totalPages() {
+      return Math.ceil(this.tableData.length / this.perPage) || 1;
+   },
   },
 };
 </script>
@@ -165,7 +168,7 @@ export default {
             >
               Previous
             </button>
-            <span class="text-gray-600">Page {{ currentPage }}</span>
+            <span class="text-gray-600">Page {{ currentPage }} of {{ totalPages() }}</span>
             <button
               @click="fetchKnowledgeData(currentPage + 1)"
               :disabled="!hasMore"

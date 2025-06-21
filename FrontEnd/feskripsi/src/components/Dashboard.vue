@@ -142,6 +142,7 @@ export default {
         const res = await api.get('chats/count-this-week');
         const data = res.data;
         this.questionsThisWeek = data.count || 0;
+        console.log(res)
       } catch (err) {
         console.error("Failed to fetch questions count this week:", err);
       }
@@ -170,14 +171,17 @@ export default {
     },
     async fetchChatData() {
       try {
-        const response = await api.get('chats/get');
-        const data = res.data;
+        // const response = await api.get('http://localhost:5000/api/chats');
+        const response = await api.get('chats');
+        const data = response.data;
         const chatData = data.chats || [];
         this.chatData = chatData;
 
         const { labels, days } = this.getLast7DaysLabelsAndDates();
         this.last7DaysLabels = labels;
         this.last7DaysCounts = this.countMessagesPerDay(chatData, days);
+
+        console.log("chatData", response)
 
         // Only render if there is at least one value > 0
         if (this.last7DaysCounts.some(cnt => cnt > 0)) {
@@ -230,6 +234,7 @@ export default {
         const response = await api.post('/faq/post', this.newFaq)
         Swal.fire("Success!", "New FAQ has been added", "success");
         await this.fetchFaqData();
+        console.log(response)
         this.closeModal();
         this.newFaq = { question: "", answer: ""};
       } catch (error) {

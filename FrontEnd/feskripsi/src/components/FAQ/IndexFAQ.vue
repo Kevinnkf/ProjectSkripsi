@@ -295,7 +295,8 @@ export default {
     },
     async fetchChatData() {
       try {
-        const response = await api.get('/chats/get');
+        // const response = await api.get('http://localhost:5000/api/chats');
+        const response = await api.get('/chats');
         const data = await response.json();
         const chatData = data.chats || [];
         this.chatData = chatData;
@@ -357,6 +358,7 @@ export default {
         // const response = await api.post('http://localhost:5000/api/faq/post', this.newFaq)
         Swal.fire("Success!", "New FAQ has been added", "success");
         await this.fetchFaqData();
+        console.log(response)
         this.closeModal();
         this.newFaq = { question: "", answer: ""};
       } catch (error) {
@@ -375,6 +377,7 @@ export default {
         // const response = await api.put(`http://localhost:5000/api/faq/edit/${id}`, payload )
         Swal.fire("Success!", "FAQ has been edited", "success");
         await this.fetchFaqData();
+        console.log(response)
         this.closeDetailModal();
         this.newFaq = { question: "", answer: ""};
       } catch (error) {
