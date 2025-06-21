@@ -10,3 +10,6 @@ dist/
 
 # Colab
 .ipynb_checkpoints/
+
+# ENV
+.env
