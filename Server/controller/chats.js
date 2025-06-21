@@ -123,7 +123,7 @@ export async function sendMessageToBot(req, res) {
     });
   } catch (err) {
     console.error('sendMessageToBot error:', err);
-    return res.status(500).json({ error: 'Failed to get bot response' });
+    return res.status(500).json({ error: 'Failed to get bot response' + err });
   }
 }
 
