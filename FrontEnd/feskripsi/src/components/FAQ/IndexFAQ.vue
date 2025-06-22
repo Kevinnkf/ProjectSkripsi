@@ -221,7 +221,6 @@ import axios from 'axios';
 export default {
   data() {
     return {
-      questionsThisWeek: 0,
       chatData: [],
       faqData: [],
       categoryData: [],
@@ -238,7 +237,6 @@ export default {
     }
   },
   mounted() {
-    this.fetchQuestionsThisWeek();
     this.fetchChatData();
     this.fetchFaqData();
     this.fetchClassifiedData();
@@ -249,6 +247,7 @@ export default {
         const res = await ragApi.post("/predict", {});
         // const res = await axios.post("http://localhost:8000/predict");
         const results = res.data.results || [];
+        console.log(results)
 
         this.categoryData = results.map(item => ({
           question: item.question, 
@@ -262,63 +261,12 @@ export default {
         console.error("Failed to fetch classification data:", err);
       }
     },
-    getLast7DaysLabelsAndDates() {
-      // Returns { labels: ['Sun',...], days: ['2024-07-04', ...] }
-      const labels = [];
-      const days = [];
-      const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-      for (let i = 6; i >= 0; i--) {
-        const d = new Date();
-        d.setDate(d.getDate() - i);
-        const isoDate = d.toISOString().slice(0, 10);
-        labels.push(dayNames[d.getDay()]);
-        days.push(isoDate);
-      }
-      return { labels, days };
-    },
-    countMessagesPerDay(data, days) {
-      return days.map(day =>
-        data.filter(chat => {
-          const created = chat.created_at || chat.createdAt || "";
-          return typeof created === "string" && created.startsWith(day);
-        }).length
-      );
-    },
-    renderChart() {
-      const ctx = document.getElementById('myChart');
-      if (!ctx) return;
-      if (this.chart) {
-        this.chart.destroy();
-      }
-      this.chart = new Chart(ctx, {
-        type: 'line',
-        data: {
-          labels: this.last7DaysLabels,
-          datasets: [{
-            label: 'Chatbot Responses (Last 7 Days)',
-            data: this.last7DaysCounts,
-            borderColor: '#60a5fa',
-            backgroundColor: '#60a5fa33',
-            tension: 0.4,
-            fill: true,
-          }],
-        },
-        options: {
-          responsive: true,
-          plugins: {
-            legend: { display: false }
-          },
-          scales: {
-            y: { beginAtZero: true, ticks: { precision: 0 } },
-          },
-        },
-      });
-    },
     async fetchFaqData() {
       try {
         const response = await api.get("/faq");
         // const response = await axios.get("http://localhost:5000/api/faq");
         this.faqData = response.data;
+        console.log(response.data)
       } catch (error) {
         console.error("Error fetching FAQ data:", error);
       }
