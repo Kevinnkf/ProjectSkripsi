@@ -246,16 +246,16 @@ export default {
         const res = await ragApi.post("/predict", {});
         // const res = await axios.post("http://localhost:8000/predict");
         const results = res.data.results || [];
-        console.log(results)
+        console.log("classified data", results)
 
         this.categoryData = results.map(item => ({
-          question: item.question, 
-          answer: item.answer,
-          matched_faq_question: item.matched_faq_question,
-          frequency: item.frequency,
-          relatedQuestions: item.related_questions,
+          question: item.Question,
+          answer: item.Answer,
+          matched_faq_question: item.Question, // or leave this out if you don’t need it
+          frequency: item.Frequency,
+          relatedQuestions: item["Related Questions"] || [],
           createdAt: new Date().toISOString(),
-        }));
+        })).sort((a, b) => b.frequency - a.frequency);
       } catch (err) {
         console.error("Failed to fetch classification data:", err);
       }
