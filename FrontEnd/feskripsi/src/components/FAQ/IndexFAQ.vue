@@ -237,7 +237,6 @@ export default {
     }
   },
   mounted() {
-    this.fetchChatData();
     this.fetchFaqData();
     this.fetchClassifiedData();
   },
