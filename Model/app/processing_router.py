@@ -259,20 +259,29 @@ async def get_data(page: int = Query(1, ge=1), limit: int = Query(5, ge=1)):
     try:
         offset = (page - 1) * limit
 
+        # Fetch paginated data
         response = client.scroll(
             collection_name=COLLECTION_NAME,
             offset=offset,
             limit=limit
         )
-
         points = [r.dict() if hasattr(r, 'dict') else r for r in response[0]]
+
+        # Count total points in the collection
+        count_response = client.count(
+            collection_name=COLLECTION_NAME,
+            exact=True,
+            count_filter=Filter(must=[])
+        )
+        total = count_response.count
 
         return JSONResponse(status_code=200, content={
             "message": "Success fetching data",
             "data": points,
             "page": page,
             "limit": limit,
-            "has_more": len(points) == limit  # for frontend to know if there's more
+            "has_more": len(points) == limit,
+            "total": total 
         })
     except Exception as e:
         return JSONResponse(status_code=500, content={

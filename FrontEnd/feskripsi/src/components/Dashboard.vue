@@ -156,7 +156,7 @@ export default {
         console.error("Failed to fetch questions count this week:", err);
       }
     },
-    countUniqueUsersPerDay(data, days) {
+    async countUniqueUsersPerDay(data, days) {
         const ips = new Set(); 
 
         data.forEach(chat => {
