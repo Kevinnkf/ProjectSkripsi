@@ -177,8 +177,8 @@ export default {
     },
     async fetchKnowledgeData(page = 1) {
       try {
-        const { data } = await ragApi.get(`http://localhost:8000/get-data?page=${page}&limit=${this.limit}`);
-        // const { data } = await ragApi.get(`/get-data?page=${page}&limit=${this.limit}`);
+        // const { data } = await ragApi.get(`http://localhost:8000/get-data?page=${page}&limit=${this.limit}`);
+        const { data } = await ragApi.get(`/get-data?page=${page}&limit=${this.limit}`);
         this.bkData = data.data;
         this.totalDataCount = data.total;
         this.currentPage = page;
