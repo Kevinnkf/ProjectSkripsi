@@ -19,7 +19,7 @@ FALLBACK = (
     "Maaf pertanyaan Anda tidak ada di pencarian dokumen kami, "
     "silakan hubungi akademik@pnj.ac.id untuk pertanyaan lebih lanjut. Terima kasih."
 )
-SIMILARITY_THRESHOLD = 0.7
+SIMILARITY_THRESHOLD = 0.75
 
 # ── load model & tokenizer (4-bit Qwen2.5-3B)
 bnb_config = BitsAndBytesConfig(
