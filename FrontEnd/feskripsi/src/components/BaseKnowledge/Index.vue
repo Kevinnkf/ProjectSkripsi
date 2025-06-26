@@ -38,8 +38,25 @@ export default {
     },
 
     async onChangeFileUpload(event){
-      this.newKnowledge.file = event.target.files[0];
-      // console.log("Selected file:", this.newKnowledge);
+      const file = event.target.files[0];
+      if (!file) return;
+
+      const allowedExtensions = ['pdf', 'xlsx'];
+      const fileExtension = file.name.split('.').pop().toLowerCase();
+
+      if (!allowedExtensions.includes(fileExtension)) {
+        Swal.fire(
+          "Invalid File Type",
+          "Only PDF and XLSX files are allowed.",
+          "error"
+        );
+        event.target.value = ""; // Reset the file input
+        this.newKnowledge.file = null;
+        return;
+      }
+
+      this.newKnowledge.file = file;
+      console.log("Selected file:", this.newKnowledge);
     },
 
     async addKnowledge() {
@@ -197,6 +214,7 @@ export default {
                 type="file"
                 id="file"
                 ref="file"
+                accept=".pdf, .xlsx"
                 @change="onChangeFileUpload"
               />
             </div>
