@@ -205,7 +205,7 @@ const hasFeedback = (chat, type) => {
             placeholder="Type a message..."
           />
           <button
-            @click="sendMessage"
+            @click="() => sendMessage()"
             class="bg-green-600 hover:bg-green-700 text-white p-2 rounded-full transition"
           >
           <svg
