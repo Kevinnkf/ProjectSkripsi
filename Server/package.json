@@ -27,6 +27,6 @@
     "pg-hstore": "^2.3.4",
     "postgres": "^3.4.5",
     "projectskripsi": "file:",
-    "sequelize": "^6.37.7"
+    "sequelize": "^6.37.8"
   }
 }
